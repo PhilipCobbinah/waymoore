@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact - Waymoore Shop</title>
+    <title>Shopping Cart - WAYMOORE</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -11,9 +11,7 @@
     <header>
         <nav>
             <h2>
-                <a href="index.html">
-                    <img src="assets/img/products/waymoore_logo.jpg" alt="Waymoore Logo">
-                </a>
+                <img src="assets/img/products/waymoore_logo.jpg" alt="Waymoore Logo">
             </h2>
             <div>
                 <a href="index.html">Home</a>
@@ -24,7 +22,7 @@
                     <i class="fas fa-shopping-cart"></i>
                     <span class="cart-count">0</span>
                 </a>
-                <a href="login.html" id="user-account-link" class="user-link">
+                <a href="#" id="user-account-link" class="user-link">
                     <i class="fas fa-user"></i>
                 </a>
             </div>
@@ -32,31 +30,45 @@
     </header>
 
     <main>
-        <section class="contact">
-            <h1>Contact Us</h1>
+        <section class="cart-section">
+            <h1><i class="fas fa-shopping-cart"></i> Shopping Cart</h1>
             
-            <div class="contact-methods">
-                <a href="https://wa.me/233592805834" target="_blank" class="whatsapp-icon" title="Chat on WhatsApp: 0592805834">
-                    <i class="fab fa-whatsapp"></i>
-                    <span>WhatsApp</span>
-                </a>
+            <div class="cart-container">
+                <div class="cart-items" id="cart-items">
+                    <!-- Cart items will be loaded here -->
+                </div>
+                
+                <div class="cart-summary">
+                    <h2><i class="fas fa-receipt"></i> Order Summary</h2>
+                    <div class="summary-item-info" id="summary-item-count">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span>0 items</span>
+                    </div>
+                    
+                    <div id="summary-product-list"></div>
+                    
+                    <div class="summary-divider"></div>
+                    
+                    <div class="summary-row">
+                        <span><i class="fas fa-calculator"></i> Subtotal:</span>
+                        <span id="cart-subtotal">₵0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span><i class="fas fa-truck"></i> Shipping:</span>
+                        <span id="cart-shipping">₵0.00</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span><i class="fas fa-money-bill-wave"></i> Total:</span>
+                        <span id="cart-total">₵0.00</span>
+                    </div>
+                    <button class="btn checkout-btn" id="checkout-btn">
+                        <i class="fas fa-lock"></i> Proceed to Checkout
+                    </button>
+                    <a href="products.html" class="btn continue-shopping">
+                        <i class="fas fa-arrow-left"></i> Continue Shopping
+                    </a>
+                </div>
             </div>
-            
-            <form id="contact-form">
-                <div class="form-group">
-                    <label for="name">Name:</label>
-                    <input type="text" id="name" name="name" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="message">Message:</label>
-                    <textarea id="message" name="message" rows="5" required></textarea>
-                </div>
-                <button type="submit" class="btn">Send Message</button>
-            </form>
         </section>
     </main>
 
@@ -85,7 +97,7 @@
         <p>&copy; 2024 Waymoore Shop. All rights reserved.</p>
     </footer>
 
-    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/products.js"></script>
     <script src="assets/js/cart.js"></script>
     <script src="assets/js/app.js"></script>
 </body>

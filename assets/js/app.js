@@ -60,7 +60,7 @@ function createMobileMenu() {
     // Check if toggle button already exists
     if (nav.querySelector('.mobile-menu-toggle')) return;
     
-    // Create mobile menu toggle button
+    // Create mobile menu toggle button with larger icon
     const toggleButton = document.createElement('button');
     toggleButton.className = 'mobile-menu-toggle';
     toggleButton.innerHTML = '<i class="fas fa-bars"></i>';
@@ -73,13 +73,25 @@ function createMobileMenu() {
     // Toggle menu on button click
     toggleButton.addEventListener('click', function(e) {
         e.stopPropagation();
-        navDiv.classList.toggle('active');
+        const isActive = navDiv.classList.toggle('active');
         
-        // Change icon
+        // Change icon with animation
         const icon = toggleButton.querySelector('i');
-        if (navDiv.classList.contains('active')) {
+        if (isActive) {
             icon.className = 'fas fa-times';
             document.body.style.overflow = 'hidden'; // Prevent scrolling
+            
+            // Add entrance animation to links
+            const links = navDiv.querySelectorAll('a');
+            links.forEach((link, index) => {
+                link.style.opacity = '0';
+                link.style.transform = 'translateX(-20px)';
+                setTimeout(() => {
+                    link.style.transition = 'all 0.3s ease';
+                    link.style.opacity = '1';
+                    link.style.transform = 'translateX(0)';
+                }, 100 * index);
+            });
         } else {
             icon.className = 'fas fa-bars';
             document.body.style.overflow = ''; // Restore scrolling

@@ -169,27 +169,30 @@ const products = [
     }
 ];
 
+let currentSlideIndex = 0;
+let isDragging = false;
+let startPos = 0;
+let currentTranslate = 0;
+let prevTranslate = 0;
+let sliderInterval;
+let autoSlideInterval;
+
 document.addEventListener('DOMContentLoaded', function() {
     const productGrid = document.getElementById('product-grid');
     const productList = document.querySelector('.product-list');
     const sliderContainer = document.querySelector('.slider-container');
     
-    // Display featured products in slider (first 6 products, duplicated for infinite scroll)
+    // Display featured products in slider
     if (sliderContainer) {
-        const featuredProducts = products.slice(0, 6);
-        // Duplicate products for seamless loop
-        const allSliderProducts = [...featuredProducts, ...featuredProducts];
-        
-        allSliderProducts.forEach((product, i) => {
+        products.forEach((product, i) => {
             const productCard = document.createElement('div');
             productCard.className = 'product-card';
-            const productIndex = products.findIndex(p => p.id === product.id);
             productCard.innerHTML = `
                 <img src="${product.image}" alt="${product.name}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22250%22 height=%22200%22%3E%3Crect fill=%22%23ddd%22 width=%22250%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2220%22 fill=%22%23999%22%3ENo Image%3C/text%3E%3C/svg%3E'">
                 <h3>${product.name}</h3>
                 <p class="cat">${product.category}</p>
                 <p class="price">${product.price}</p>
-                <button type="button" class="view-details-btn" data-index="${productIndex}">View Details</button>
+                <button type="button" class="view-details-btn" data-index="${i}">View Details</button>
             `;
             sliderContainer.appendChild(productCard);
         });
@@ -201,6 +204,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 openProduct(index);
             });
         });
+        
+        // Initialize slider controls
+        initSliderControls();
     }
     
     // Display all products in grid (hidden initially)
@@ -229,6 +235,214 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+function initSliderControls() {
+    const sliderContainer = document.querySelector('.slider-container');
+    const prevBtn = document.querySelector('.slider-nav.prev');
+    const nextBtn = document.querySelector('.slider-nav.next');
+    const dotsContainer = document.querySelector('.slider-dots');
+    
+    if (!sliderContainer || !prevBtn || !nextBtn) return;
+    
+    const cards = sliderContainer.querySelectorAll('.product-card');
+    const cardWidth = 300; // card width + gap
+    const visibleCards = getVisibleCards();
+    const totalSlides = Math.ceil(products.length / visibleCards);
+    
+    // Create dots
+    createDots(totalSlides, dotsContainer);
+    
+    // Navigation buttons
+    prevBtn.addEventListener('click', () => {
+        if (currentSlideIndex > 0) {
+            currentSlideIndex--;
+            updateSlider();
+            resetAutoSlide();
+        }
+    });
+    
+    nextBtn.addEventListener('click', () => {
+        if (currentSlideIndex < totalSlides - 1) {
+            currentSlideIndex++;
+            updateSlider();
+            resetAutoSlide();
+        }
+    });
+    
+    // Touch/Mouse drag support
+    sliderContainer.addEventListener('mousedown', dragStart);
+    sliderContainer.addEventListener('touchstart', dragStart);
+    sliderContainer.addEventListener('mouseup', dragEnd);
+    sliderContainer.addEventListener('touchend', dragEnd);
+    sliderContainer.addEventListener('mouseleave', dragEnd);
+    sliderContainer.addEventListener('mousemove', drag);
+    sliderContainer.addEventListener('touchmove', drag);
+    
+    // Pause auto-slide on hover
+    sliderContainer.addEventListener('mouseenter', () => {
+        stopAutoSlide();
+    });
+    
+    sliderContainer.addEventListener('mouseleave', () => {
+        startAutoSlide();
+    });
+    
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft' && currentSlideIndex > 0) {
+            currentSlideIndex--;
+            updateSlider();
+            resetAutoSlide();
+        } else if (e.key === 'ArrowRight' && currentSlideIndex < totalSlides - 1) {
+            currentSlideIndex++;
+            updateSlider();
+            resetAutoSlide();
+        }
+    });
+    
+    // Update on resize
+    window.addEventListener('resize', () => {
+        updateSlider();
+        resetAutoSlide();
+    });
+    
+    updateSlider();
+    startAutoSlide(); // Start automatic sliding
+}
+
+function startAutoSlide() {
+    stopAutoSlide(); // Clear any existing interval
+    
+    autoSlideInterval = setInterval(() => {
+        const visibleCards = getVisibleCards();
+        const totalSlides = Math.ceil(products.length / visibleCards);
+        
+        currentSlideIndex++;
+        
+        // Loop back to start when reaching the end
+        if (currentSlideIndex >= totalSlides) {
+            currentSlideIndex = 0;
+        }
+        
+        updateSlider();
+    }, 3000); // Slide every 3 seconds
+}
+
+function stopAutoSlide() {
+    if (autoSlideInterval) {
+        clearInterval(autoSlideInterval);
+        autoSlideInterval = null;
+    }
+}
+
+function resetAutoSlide() {
+    stopAutoSlide();
+    startAutoSlide();
+}
+
+function getVisibleCards() {
+    const width = window.innerWidth;
+    if (width < 480) return 1;
+    if (width < 768) return 2;
+    if (width < 968) return 3;
+    return 4;
+}
+
+function createDots(totalSlides, container) {
+    if (!container) return;
+    
+    container.innerHTML = '';
+    for (let i = 0; i < totalSlides; i++) {
+        const dot = document.createElement('button');
+        dot.className = 'slider-dot';
+        dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+        if (i === 0) dot.classList.add('active');
+        
+        dot.addEventListener('click', () => {
+            currentSlideIndex = i;
+            updateSlider();
+            resetAutoSlide(); // Reset auto-slide timer when user clicks a dot
+        });
+        
+        container.appendChild(dot);
+    }
+}
+
+function updateSlider() {
+    const sliderContainer = document.querySelector('.slider-container');
+    const prevBtn = document.querySelector('.slider-nav.prev');
+    const nextBtn = document.querySelector('.slider-nav.next');
+    const dots = document.querySelectorAll('.slider-dot');
+    
+    if (!sliderContainer) return;
+    
+    const visibleCards = getVisibleCards();
+    const cardWidth = 300;
+    const translateX = currentSlideIndex * cardWidth * visibleCards;
+    
+    sliderContainer.style.transform = `translateX(-${translateX}px)`;
+    
+    // Update button states
+    if (prevBtn) prevBtn.disabled = currentSlideIndex === 0;
+    if (nextBtn) {
+        const totalSlides = Math.ceil(products.length / visibleCards);
+        nextBtn.disabled = currentSlideIndex >= totalSlides - 1;
+    }
+    
+    // Update dots
+    dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === currentSlideIndex);
+    });
+}
+
+function dragStart(e) {
+    isDragging = true;
+    startPos = getPositionX(e);
+    const sliderContainer = document.querySelector('.slider-container');
+    sliderContainer.classList.add('no-transition');
+    stopAutoSlide(); // Stop auto-slide when user interacts
+}
+
+function drag(e) {
+    if (!isDragging) return;
+    e.preventDefault();
+    
+    const currentPosition = getPositionX(e);
+    currentTranslate = prevTranslate + currentPosition - startPos;
+    
+    const sliderContainer = document.querySelector('.slider-container');
+    sliderContainer.style.transform = `translateX(${currentTranslate}px)`;
+}
+
+function dragEnd() {
+    if (!isDragging) return;
+    
+    isDragging = false;
+    const sliderContainer = document.querySelector('.slider-container');
+    sliderContainer.classList.remove('no-transition');
+    
+    const movedBy = currentTranslate - prevTranslate;
+    const threshold = 50;
+    
+    if (movedBy < -threshold && currentSlideIndex < Math.ceil(products.length / getVisibleCards()) - 1) {
+        currentSlideIndex++;
+    } else if (movedBy > threshold && currentSlideIndex > 0) {
+        currentSlideIndex--;
+    }
+    
+    updateSlider();
+    
+    const visibleCards = getVisibleCards();
+    const cardWidth = 300;
+    prevTranslate = -currentSlideIndex * cardWidth * visibleCards;
+    currentTranslate = prevTranslate;
+    
+    startAutoSlide(); // Resume auto-slide after user interaction
+}
+
+function getPositionX(e) {
+    return e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
+}
 
 function openProduct(i) {
     if (typeof products === 'undefined' || !products[i]) {
@@ -309,14 +523,7 @@ function toggleAllProducts() {
 }
 
 function addToCart(productId) {
-    const product = products.find(p => p.id === productId);
-    if (!product) {
-        alert('Product not found!');
-        return;
-    }
-    
-    alert(`${product.name} added to cart!\n\nPrice: ${product.price}\n\nThank you for shopping with WAYMOORE!`);
-    closeModal();
+    CartManager.addToCart(productId);
 }
 
 // Make functions globally available

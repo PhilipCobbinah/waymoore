@@ -12,13 +12,22 @@
 <header>
     <nav>
         <h2>
-            <img src="assets/img/products/waymoore_logo.jpg" alt="Waymoore Logo">
+            <a href="index.html">
+                <img src="assets/img/products/waymoore_logo.jpg" alt="Waymoore Logo">
+            </a>
         </h2>
         <div>
             <a href="index.html">Home</a>
             <a href="products.html">Products</a>
             <a href="about.html">About</a>
             <a href="contact.html">Contact</a>
+            <a href="cart.html" class="cart-link">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count">0</span>
+            </a>
+            <a href="login.html" id="user-account-link" class="user-link">
+                <i class="fas fa-user"></i>
+            </a>
         </div>
     </nav>
 </header>
@@ -50,7 +59,7 @@
 </section>
 
 <section class="categories-section">
-    <h2 style="text-align:center; padding: 40px 20px 20px;">Shop by Category</h2>
+    <h2>Shop by Category</h2>
     <div class="categories-grid">
         <div class="category-card" onclick="window.location.href='products.html'">
             <img src="assets/img/categories/health-wellness.jpg" alt="Health & Wellness">
@@ -96,6 +105,8 @@
     <p>&copy; 2024 Waymoore Shop. All rights reserved.</p>
 </footer>
 
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/cart.js"></script>
 <script src="assets/js/app.js"></script>
 <script src="assets/js/hero.js"></script>
 </body>
