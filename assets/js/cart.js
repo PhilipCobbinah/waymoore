@@ -31,26 +31,102 @@ const CartManager = {
         
         if (cartItem) {
             cartItem.quantity += 1;
+            alert(`${product.name} quantity increased to ${cartItem.quantity}!`);
         } else {
             users[userIndex].cart.push({
                 productId: product.id,
                 name: product.name,
                 price: product.price,
                 image: product.image,
+                category: product.category || 'Product',
                 quantity: 1
             });
+            alert(`${product.name} added to cart!\n\nPrice: ${product.price}\nYou can view your cart to see all items and proceed to checkout.`);
         }
 
         // Update storage
         localStorage.setItem('waymoreUsers', JSON.stringify(users));
         localStorage.setItem('waymoreCurrentUser', JSON.stringify(users[userIndex]));
 
-        alert(`${product.name} added to cart!`);
         this.updateCartUI();
+        this.showQuickCartSummary();
         
         if (typeof closeModal === 'function') {
             closeModal();
         }
+    },
+
+    showQuickCartSummary() {
+        const user = AuthManager.getCurrentUser();
+        if (!user || user.cart.length === 0) return;
+
+        const totalItems = this.getItemCount();
+        const total = this.getCartTotal();
+
+        // Create a temporary notification
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4);
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+            max-width: 350px;
+        `;
+
+        notification.innerHTML = `
+            <style>
+                @keyframes slideIn {
+                    from { transform: translateX(400px); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            </style>
+            <h4 style="margin: 0 0 0.8rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-shopping-cart"></i> Cart Updated
+            </h4>
+            <p style="margin: 0.5rem 0; font-size: 0.9rem;">
+                <strong>${totalItems}</strong> items in cart
+            </p>
+            <p style="margin: 0.5rem 0; font-size: 1.1rem; font-weight: bold;">
+                Total: ₵${total.toFixed(2)}
+            </p>
+            <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                <a href="cart.html" style="
+                    flex: 1;
+                    padding: 0.5rem;
+                    background: white;
+                    color: #10b981;
+                    text-align: center;
+                    text-decoration: none;
+                    border-radius: 5px;
+                    font-weight: 600;
+                    font-size: 0.9rem;
+                ">View Cart</a>
+                <button onclick="this.parentElement.parentElement.remove()" style="
+                    padding: 0.5rem 1rem;
+                    background: rgba(255,255,255,0.2);
+                    color: white;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-weight: 600;
+                ">Close</button>
+            </div>
+        `;
+
+        document.body.appendChild(notification);
+
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 5000);
     },
 
     removeFromCart(productId) {
@@ -259,26 +335,35 @@ const CartManager = {
             `;
         }
 
-        // Update product list in summary
+        // Update product list in summary with detailed breakdown
         const summaryProductList = document.getElementById('summary-product-list');
         if (summaryProductList && user && user.cart.length > 0) {
-            summaryProductList.innerHTML = `
+            let productListHTML = `
                 <div class="summary-products">
-                    <h3>Order Items:</h3>
-                    ${user.cart.map((item, i) => {
-                        const itemPrice = parseFloat(item.price.replace('₵', ''));
-                        const itemTotal = itemPrice * item.quantity;
-                        return `
-                            <div class="summary-product-item">
-                                <span class="item-num">${i + 1}.</span>
-                                <span class="item-name">${item.name}</span>
-                                <span class="item-qty">×${item.quantity}</span>
-                                <span class="item-price">₵${itemTotal.toFixed(2)}</span>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
+                    <h3><i class="fas fa-list"></i> Order Items:</h3>
             `;
+
+            user.cart.forEach((item, i) => {
+                const itemPrice = parseFloat(item.price.replace('₵', ''));
+                const itemTotal = itemPrice * item.quantity;
+                
+                productListHTML += `
+                    <div class="summary-product-item">
+                        <div class="summary-item-header">
+                            <span class="item-num">${i + 1}.</span>
+                            <span class="item-name">${item.name}</span>
+                        </div>
+                        <div class="summary-item-details">
+                            <span class="item-unit-price">${item.price} each</span>
+                            <span class="item-qty">× ${item.quantity}</span>
+                            <span class="item-price">₵${itemTotal.toFixed(2)}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            productListHTML += `</div>`;
+            summaryProductList.innerHTML = productListHTML;
         }
     },
 
@@ -295,13 +380,36 @@ const CartManager = {
 
             const user = AuthManager.getCurrentUser();
             
-            if (user.cart.length === 0) {
-                alert('Your cart is empty!');
+            if (!user.cart || user.cart.length === 0) {
+                alert('Your cart is empty! Add some products first.');
+                window.location.href = 'products.html';
                 return;
             }
 
-            // Redirect to checkout page
-            window.location.href = 'checkout.html';
+            // Show loading/confirmation
+            const subtotal = this.getCartTotal();
+            const shipping = 10;
+            const total = subtotal + shipping;
+            const itemCount = this.getItemCount();
+            
+            const confirmMessage = `Ready to checkout?\n\n` +
+                `Items: ${user.cart.length} products (${itemCount} items)\n` +
+                `Total: ₵${total.toFixed(2)}\n\n` +
+                `Click OK to proceed to checkout page.`;
+
+            if (confirm(confirmMessage)) {
+                // Save cart summary to sessionStorage for checkout page
+                sessionStorage.setItem('checkoutData', JSON.stringify({
+                    cart: user.cart,
+                    subtotal: subtotal,
+                    shipping: shipping,
+                    total: total,
+                    itemCount: itemCount
+                }));
+                
+                // Redirect to checkout page
+                window.location.href = 'checkout.html';
+            }
         });
     },
 

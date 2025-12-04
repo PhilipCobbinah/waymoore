@@ -16,7 +16,7 @@ const CheckoutManager = {
 
         const user = AuthManager.getCurrentUser();
         if (!user.cart || user.cart.length === 0) {
-            alert('Your cart is empty!');
+            alert('Your cart is empty! Please add items to your cart first.');
             window.location.href = 'products.html';
             return;
         }
@@ -28,21 +28,37 @@ const CheckoutManager = {
         
         if (!itemsContainer) return;
 
-        itemsContainer.innerHTML = user.cart.map(item => {
+        if (!user.cart || user.cart.length === 0) {
+            itemsContainer.innerHTML = '<p style="text-align: center; color: #6b7280; padding: 2rem;">No items in cart</p>';
+            return;
+        }
+
+        let summaryHTML = '<div class="checkout-items-list">';
+        
+        user.cart.forEach((item, index) => {
             const itemPrice = parseFloat(item.price.replace('₵', ''));
             const itemTotal = itemPrice * item.quantity;
             
-            return `
+            summaryHTML += `
                 <div class="checkout-item">
+                    <div class="checkout-item-number">${index + 1}</div>
                     <img src="${item.image}" alt="${item.name}">
                     <div class="checkout-item-info">
                         <h4>${item.name}</h4>
-                        <p>Qty: ${item.quantity} × ${item.price}</p>
+                        <p class="checkout-item-meta">
+                            <span class="item-category">${item.category || 'Product'}</span>
+                        </p>
+                        <p class="checkout-item-pricing">
+                            <span>${item.price} × ${item.quantity}</span>
+                        </p>
                     </div>
                     <div class="checkout-item-price">₵${itemTotal.toFixed(2)}</div>
                 </div>
             `;
-        }).join('');
+        });
+        
+        summaryHTML += '</div>';
+        itemsContainer.innerHTML = summaryHTML;
 
         this.updateTotals();
     },
@@ -51,10 +67,17 @@ const CheckoutManager = {
         const subtotal = CartManager.getCartTotal();
         const shipping = 10;
         const total = subtotal + shipping;
+        const itemCount = CartManager.getItemCount();
 
         document.getElementById('checkout-subtotal').textContent = `₵${subtotal.toFixed(2)}`;
         document.getElementById('checkout-shipping').textContent = `₵${shipping.toFixed(2)}`;
         document.getElementById('checkout-total').textContent = `₵${total.toFixed(2)}`;
+        
+        // Update item count display
+        const itemCountEl = document.querySelector('.checkout-item-count');
+        if (itemCountEl) {
+            itemCountEl.textContent = `${itemCount} ${itemCount === 1 ? 'item' : 'items'}`;
+        }
     },
 
     setupPaymentToggle() {
@@ -111,7 +134,13 @@ const CheckoutManager = {
 
         // Validate
         if (!orderData.fullName || !orderData.phone || !orderData.address || !orderData.city) {
-            alert('Please fill in all required fields!');
+            alert('Please fill in all required fields marked with *');
+            return;
+        }
+
+        // Phone validation
+        if (orderData.phone.length < 10) {
+            alert('Please enter a valid phone number');
             return;
         }
 
@@ -122,19 +151,43 @@ const CheckoutManager = {
         const itemCount = CartManager.getItemCount();
 
         let paymentMethodName = '';
+        let paymentIcon = '';
         switch(orderData.paymentMethod) {
-            case 'momo': paymentMethodName = 'Mobile Money (MoMo)'; break;
-            case 'card': paymentMethodName = 'Credit/Debit Card'; break;
-            case 'cash': paymentMethodName = 'Cash on Delivery'; break;
+            case 'momo': 
+                paymentMethodName = 'Mobile Money (MoMo)'; 
+                paymentIcon = '📱';
+                break;
+            case 'card': 
+                paymentMethodName = 'Credit/Debit Card'; 
+                paymentIcon = '💳';
+                break;
+            case 'cash': 
+                paymentMethodName = 'Cash on Delivery'; 
+                paymentIcon = '💵';
+                break;
         }
 
-        const confirmMessage = `Confirm Your Order:\n\n` +
+        const confirmMessage = 
+            `━━━━━━━━━━━━━━━━━━━━━━\n` +
+            `📦 CONFIRM YOUR ORDER\n` +
+            `━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+            `👤 Customer Details:\n` +
             `Name: ${orderData.fullName}\n` +
             `Phone: ${orderData.phone}\n` +
-            `Address: ${orderData.address}, ${orderData.city}\n\n` +
-            `Items: ${user.cart.length} (${itemCount} total quantity)\n` +
-            `Total: ₵${total.toFixed(2)}\n\n` +
-            `Payment Method: ${paymentMethodName}\n\n` +
+            `Email: ${orderData.email || 'Not provided'}\n\n` +
+            `📍 Delivery Address:\n` +
+            `${orderData.address}\n` +
+            `${orderData.city}\n\n` +
+            `🛍️ Order Summary:\n` +
+            `Products: ${user.cart.length}\n` +
+            `Total Items: ${itemCount}\n` +
+            `Subtotal: ₵${subtotal.toFixed(2)}\n` +
+            `Shipping: ₵${shipping.toFixed(2)}\n` +
+            `━━━━━━━━━━━━━━━━━━━━━━\n` +
+            `TOTAL: ₵${total.toFixed(2)}\n` +
+            `━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+            `${paymentIcon} Payment: ${paymentMethodName}\n\n` +
+            (orderData.notes ? `📝 Notes: ${orderData.notes}\n\n` : '') +
             `Place this order?`;
 
         if (!confirm(confirmMessage)) return;
@@ -169,31 +222,61 @@ const CheckoutManager = {
         localStorage.setItem('waymoreUsers', JSON.stringify(users));
         localStorage.setItem('waymoreCurrentUser', JSON.stringify(users[userIndex]));
 
-        // Create success message
+        // Create detailed success message
         let paymentInstructions = '';
         if (orderData.paymentMethod === 'momo') {
-            paymentInstructions = `\n\nMoMo Payment Instructions:\n` +
-                `1. Send ₵${total.toFixed(2)} to: 0592805834\n` +
-                `2. Use reference: ORDER-${order.id}\n` +
-                `3. Screenshot and send via WhatsApp\n\n`;
+            paymentInstructions = 
+                `\n━━━━━━━━━━━━━━━━━━━━━━\n` +
+                `📱 MOMO PAYMENT INSTRUCTIONS\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━\n` +
+                `1. Send ₵${total.toFixed(2)} to:\n` +
+                `   📞 0592805834\n\n` +
+                `2. Reference Number:\n` +
+                `   ORDER-${order.id}\n\n` +
+                `3. Screenshot payment\n` +
+                `4. Send via WhatsApp\n`;
         } else if (orderData.paymentMethod === 'card') {
-            paymentInstructions = `\n\nCard Payment:\nWe will contact you with card payment details shortly.\n\n`;
+            paymentInstructions = 
+                `\n━━━━━━━━━━━━━━━━━━━━━━\n` +
+                `💳 CARD PAYMENT\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━\n` +
+                `We will contact you shortly\n` +
+                `with card payment details.\n`;
         } else {
-            paymentInstructions = `\n\nCash on Delivery:\nPrepare exact amount of ₵${total.toFixed(2)} for delivery.\n\n`;
+            paymentInstructions = 
+                `\n━━━━━━━━━━━━━━━━━━━━━━\n` +
+                `💵 CASH ON DELIVERY\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━\n` +
+                `Prepare exact amount:\n` +
+                `₵${total.toFixed(2)}\n` +
+                `Payment upon delivery.\n`;
         }
 
-        const successMessage = `✅ Order Placed Successfully!\n\n` +
+        const successMessage = 
+            `━━━━━━━━━━━━━━━━━━━━━━\n` +
+            `✅ ORDER PLACED SUCCESSFULLY!\n` +
+            `━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+            `📋 Order Details:\n` +
             `Order ID: ${order.id}\n` +
             `Date: ${new Date(order.date).toLocaleString()}\n\n` +
-            `Delivery To:\n${orderData.fullName}\n` +
-            `${orderData.address}, ${orderData.city}\n` +
-            `Phone: ${orderData.phone}\n\n` +
-            `Total Amount: ₵${total.toFixed(2)}\n` +
+            `📦 Delivery To:\n` +
+            `${orderData.fullName}\n` +
+            `${orderData.address}\n` +
+            `${orderData.city}\n` +
+            `📞 ${orderData.phone}\n\n` +
+            `💰 Total Amount: ₵${total.toFixed(2)}\n` +
             paymentInstructions +
-            `We'll contact you via WhatsApp (${orderData.phone}) to confirm your order.\n\n` +
-            `Thank you for choosing WAYMOORE! 🌿`;
+            `\n━━━━━━━━━━━━━━━━━━━━━━\n` +
+            `We'll contact you via:\n` +
+            `📱 WhatsApp: ${orderData.phone}\n\n` +
+            `Thank you for choosing\n` +
+            `WAYMOORE! 🌿\n` +
+            `━━━━━━━━━━━━━━━━━━━━━━`;
 
         alert(successMessage);
+        
+        // Clear checkout data from session
+        sessionStorage.removeItem('checkoutData');
         
         CartManager.updateCartUI();
         window.location.href = 'products.html';
