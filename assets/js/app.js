@@ -4,6 +4,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Mobile menu toggle
     createMobileMenu();
     
+    // Initialize cart badge
+    if (typeof CartManager !== 'undefined') {
+        setTimeout(() => {
+            CartManager.updateCartUI();
+            console.log('Cart UI initialized');
+        }, 100);
+    }
+    
     // Handle contact form submission
     const contactForm = document.getElementById('contact-form');
     
@@ -42,6 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (AuthManager.isLoggedIn()) {
         const user = AuthManager.getCurrentUser();
         console.log('User cart items:', user.cart ? user.cart.length : 0);
+        console.log('Total quantity:', user.cart ? user.cart.reduce((sum, item) => sum + item.quantity, 0) : 0);
     }
 
     // Product display functionality

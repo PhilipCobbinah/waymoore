@@ -20,7 +20,7 @@ const CartManager = {
 
     addToCart(productId) {
         if (!AuthManager.isLoggedIn()) {
-            alert('Please login to add items to cart!');
+            alert('⚠️ Please login to add items to cart!\n\nYou need to create an account or login to start shopping.');
             window.location.href = 'login.html';
             return;
         }
@@ -29,7 +29,7 @@ const CartManager = {
         const product = products.find(p => p.id === productId);
         
         if (!product) {
-            alert('Product not found!');
+            alert('❌ Product not found!');
             return;
         }
 
@@ -44,7 +44,7 @@ const CartManager = {
         
         if (cartItem) {
             cartItem.quantity += 1;
-            alert(`${product.name} quantity increased to ${cartItem.quantity}!\n\nUpdated cart total: ₵${this.calculateCartTotal(users[userIndex].cart).toFixed(2)}`);
+            alert(`✅ ${product.name}\n\nQuantity increased to ${cartItem.quantity}!\n\nCart Total: ₵${this.calculateCartTotal(users[userIndex].cart).toFixed(2)}`);
         } else {
             users[userIndex].cart.push({
                 productId: product.id,
@@ -54,20 +54,35 @@ const CartManager = {
                 category: product.category || 'Product',
                 quantity: 1
             });
-            alert(`${product.name} added to cart!\n\nPrice: ${product.price}\nYou can view your cart to see all items and proceed to checkout.`);
+            alert(`✅ ${product.name} added to cart!\n\n💰 Price: ${product.price}\n\n🛒 View your cart to see all items and checkout.`);
         }
 
         // Update storage
         localStorage.setItem('waymoreUsers', JSON.stringify(users));
         localStorage.setItem('waymoreCurrentUser', JSON.stringify(users[userIndex]));
 
-        // Force immediate update
+        // Force immediate update of cart badge
         this.updateCartUI();
-        this.displayCartItems();
+        
+        // Also update the display if on cart page
+        if (window.location.pathname.includes('cart.html')) {
+            this.displayCartItems();
+        }
+        
         this.showQuickCartSummary();
         
         if (typeof closeModal === 'function') {
             closeModal();
+        }
+        
+        // Scroll to cart icon briefly
+        const cartLink = document.querySelector('.cart-link');
+        if (cartLink) {
+            cartLink.style.transition = 'transform 0.3s ease';
+            cartLink.style.transform = 'scale(1.3)';
+            setTimeout(() => {
+                cartLink.style.transform = 'scale(1)';
+            }, 300);
         }
     },
 
@@ -229,14 +244,29 @@ const CartManager = {
         if (AuthManager.isLoggedIn()) {
             const itemCount = this.getItemCount();
             
+            console.log('Updating cart UI. Item count:', itemCount); // Debug log
+            
             cartCountElements.forEach(el => {
                 el.textContent = itemCount;
-                el.style.display = itemCount > 0 ? 'inline-flex' : 'none';
+                if (itemCount > 0) {
+                    el.style.display = 'inline-flex';
+                    el.classList.add('show');
+                    
+                    // Trigger animation
+                    el.style.animation = 'none';
+                    setTimeout(() => {
+                        el.style.animation = '';
+                    }, 10);
+                } else {
+                    el.style.display = 'none';
+                    el.classList.remove('show');
+                }
             });
         } else {
             cartCountElements.forEach(el => {
                 el.textContent = '0';
                 el.style.display = 'none';
+                el.classList.remove('show');
             });
         }
         
@@ -367,7 +397,7 @@ const CartManager = {
             `;
         }
 
-        // Update product list in summary with detailed breakdown
+        // Update product list in summary with interactive controls
         const summaryProductList = document.getElementById('summary-product-list');
         if (summaryProductList && user && user.cart && user.cart.length > 0) {
             let productListHTML = `
@@ -384,10 +414,21 @@ const CartManager = {
                         <div class="summary-item-header">
                             <span class="item-num">${i + 1}.</span>
                             <span class="item-name">${item.name}</span>
+                            <button class="summary-remove-btn" onclick="CartManager.removeFromCart(${item.productId})" title="Remove item">
+                                <i class="fas fa-times"></i>
+                            </button>
                         </div>
                         <div class="summary-item-details">
                             <span class="item-unit-price">${item.price} each</span>
-                            <span class="item-qty">× ${item.quantity}</span>
+                            <div class="summary-qty-controls">
+                                <button class="summary-qty-btn" onclick="CartManager.updateQuantity(${item.productId}, -1)" title="Decrease">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <span class="summary-qty-display">${item.quantity}</span>
+                                <button class="summary-qty-btn" onclick="CartManager.updateQuantity(${item.productId}, 1)" title="Increase">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
                             <span class="item-price">₵${itemTotal.toFixed(2)}</span>
                         </div>
                     </div>
@@ -491,3 +532,29 @@ const CartManager = {
         const users = JSON.parse(localStorage.getItem('waymoreUsers') || '[]');
         const userIndex = users.findIndex(u => u.id === user.id);
         
+        if (userIndex === -1) return;
+
+        // Create a new order object
+        const newOrder = {
+            id: `order_${Date.now()}`,
+            userId: user.id,
+            items: user.cart.map(item => ({
+                productId: item.productId,
+                quantity: item.quantity
+            })),
+            total: total,
+            status: 'pending',
+            createdAt: new Date().toISOString()
+        };
+
+        // Save the order to the user's account (in waymoreUsers)
+        users[userIndex].orders = users[userIndex].orders || [];
+        users[userIndex].orders.push(newOrder);
+
+        // Update the user data in localStorage
+        localStorage.setItem('waymoreUsers', JSON.stringify(users));
+        localStorage.setItem('waymoreCurrentUser', JSON.stringify(users[userIndex]));
+
+        return newOrder;
+    }
+};
