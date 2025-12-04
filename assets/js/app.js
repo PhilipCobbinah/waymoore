@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Mobile menu toggle
+    createMobileMenu();
+    
     // Handle contact form submission
     const contactForm = document.getElementById('contact-form');
     
@@ -10,8 +13,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const email = document.getElementById('email').value;
             const message = document.getElementById('message').value;
             
-            alert(`Thank you, ${name}! Your message has been received.`);
-            contactForm.reset();
+            if (name && email && message) {
+                alert(`Thank you, ${name}!\n\nYour message has been received. We will get back to you soon at ${email}.`);
+                contactForm.reset();
+            } else {
+                alert('Please fill in all fields.');
+            }
         });
     }
     
@@ -20,8 +27,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const navLinks = document.querySelectorAll('nav a');
     
     navLinks.forEach(link => {
-        if (link.getAttribute('href') === currentPage) {
-            link.style.color = '#4CAF50';
+        const href = link.getAttribute('href');
+        if (href === currentPage) {
+            link.style.borderBottom = '2px solid white';
+            link.style.paddingBottom = '5px';
         }
     });
 
@@ -40,6 +49,71 @@ document.addEventListener('DOMContentLoaded', function() {
         `).join("");
     }
 });
+
+function createMobileMenu() {
+    const nav = document.querySelector('nav');
+    if (!nav) return;
+    
+    const navDiv = nav.querySelector('div');
+    if (!navDiv) return;
+    
+    // Check if toggle button already exists
+    if (nav.querySelector('.mobile-menu-toggle')) return;
+    
+    // Create mobile menu toggle button
+    const toggleButton = document.createElement('button');
+    toggleButton.className = 'mobile-menu-toggle';
+    toggleButton.innerHTML = '<i class="fas fa-bars"></i>';
+    toggleButton.setAttribute('aria-label', 'Toggle menu');
+    toggleButton.setAttribute('type', 'button');
+    
+    // Insert toggle button before nav div
+    nav.insertBefore(toggleButton, navDiv);
+    
+    // Toggle menu on button click
+    toggleButton.addEventListener('click', function(e) {
+        e.stopPropagation();
+        navDiv.classList.toggle('active');
+        
+        // Change icon
+        const icon = toggleButton.querySelector('i');
+        if (navDiv.classList.contains('active')) {
+            icon.className = 'fas fa-times';
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        } else {
+            icon.className = 'fas fa-bars';
+            document.body.style.overflow = ''; // Restore scrolling
+        }
+    });
+    
+    // Close menu when clicking a link
+    const navLinks = navDiv.querySelectorAll('a');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            navDiv.classList.remove('active');
+            toggleButton.querySelector('i').className = 'fas fa-bars';
+            document.body.style.overflow = '';
+        });
+    });
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!nav.contains(e.target) && navDiv.classList.contains('active')) {
+            navDiv.classList.remove('active');
+            toggleButton.querySelector('i').className = 'fas fa-bars';
+            document.body.style.overflow = '';
+        }
+    });
+    
+    // Handle escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && navDiv.classList.contains('active')) {
+            navDiv.classList.remove('active');
+            toggleButton.querySelector('i').className = 'fas fa-bars';
+            document.body.style.overflow = '';
+        }
+    });
+}
 
 function openProduct(i) {
     const p = products[i];

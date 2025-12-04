@@ -37,7 +37,8 @@ nav {
     align-items: center;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 15px 20px;
+    position: relative;
 }
 
 .logo {
@@ -364,7 +365,9 @@ main {
     margin: 0.8rem 0;
 }
 
-.product-card button {
+.product-card button,
+.view-details-btn,
+.add-to-cart-btn {
     margin-top: 10px;
     padding: 10px 20px;
     border: none;
@@ -375,12 +378,32 @@ main {
     transition: all 0.3s ease;
     font-weight: 600;
     box-shadow: 0 3px 8px rgba(16, 185, 129, 0.3);
+    font-size: 0.95rem;
 }
 
-.product-card button:hover {
+.product-card button:hover,
+.view-details-btn:hover,
+.add-to-cart-btn:hover {
     background: linear-gradient(135deg, #059669 0%, #047857 100%);
     transform: translateY(-3px);
     box-shadow: 0 5px 12px rgba(16, 185, 129, 0.5);
+}
+
+.product-card button:active,
+.view-details-btn:active,
+.add-to-cart-btn:active {
+    transform: translateY(-1px);
+}
+
+.view-all-btn {
+    font-size: 1.1rem;
+    padding: 12px 30px;
+    cursor: pointer;
+}
+
+.view-all-btn:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    transform: translateY(-3px);
 }
 
 /* Modal */
@@ -391,10 +414,11 @@ main {
     left: 0;
     width: 100%;
     height: 100%;
-    background: #0009;
+    background: rgba(0, 0, 0, 0.8);
     padding-top: 50px;
     z-index: 1000;
     overflow: auto;
+    animation: fadeIn 0.3s ease;
 }
 
 .modal-content {
@@ -404,8 +428,19 @@ main {
     max-width: 500px;
     padding: 20px;
     border-radius: 10px;
-    animation: fadeIn .4s;
+    animation: slideIn 0.4s ease;
     position: relative;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 .modal-content img {
@@ -421,12 +456,14 @@ main {
     font-size: 28px;
     cursor: pointer;
     color: #333;
-    transition: color 0.3s;
+    transition: all 0.3s;
     line-height: 1;
+    padding: 0 5px;
 }
 
 .close:hover {
-    color: #999;
+    color: #10b981;
+    transform: rotate(90deg);
 }
 
 .modal-content h2 {
@@ -731,6 +768,7 @@ footer p {
 .view-all-btn {
     font-size: 1.1rem;
     padding: 12px 30px;
+    cursor: pointer;
 }
 
 /* Categories Section */
@@ -940,6 +978,46 @@ footer p {
 
 /* Responsive Design */
 @media (max-width: 968px) {
+    nav {
+        padding: 15px;
+    }
+    
+    nav h2 img {
+        height: 50px;
+    }
+    
+    .mobile-menu-toggle {
+        display: block;
+    }
+    
+    nav > div {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 70%;
+        height: 100vh;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        flex-direction: column;
+        justify-content: center;
+        gap: 2rem;
+        padding: 2rem;
+        transition: right 0.4s ease;
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+    }
+    
+    nav > div.active {
+        right: 0;
+    }
+    
+    nav a {
+        margin-left: 0;
+        width: 100%;
+        text-align: center;
+        font-size: 1.2rem;
+        padding: 15px 20px;
+    }
+    
     .about-container {
         grid-template-columns: 1fr;
     }
@@ -961,44 +1039,333 @@ footer p {
     .philosophy-cards {
         grid-template-columns: 1fr;
     }
+    
+    .categories-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        padding: 10px;
+        gap: 15px;
+    }
+    
+    .product-list {
+        padding: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 15px;
+    }
+    
+    .slider-container .product-card {
+        min-width: 220px;
+    }
 }
 
 @media (max-width: 768px) {
+    header::after {
+        display: none;
+    }
+    
+    nav {
+        padding: 10px 15px;
+    }
+    
+    nav h2 img {
+        height: 45px;
+    }
+    
+    nav > div {
+        width: 80%;
+    }
+    
     .hero {
-        padding: 60px 15px;
-        min-height: auto;
+        padding: 40px 15px;
+        min-height: 70vh;
     }
     
     .hero-text-slider {
-        min-height: 400px;
+        min-height: 350px;
     }
     
     .hero-slide {
-        padding: 1.5rem;
+        padding: 1.5rem 1rem;
     }
     
     .hero-slide h1 {
-        font-size: 2rem;
-    }
-    
-    .hero-slide h2 {
         font-size: 1.8rem;
     }
     
+    .hero-slide h2 {
+        font-size: 1.5rem;
+    }
+    
     .hero-subtitle {
-        font-size: 1.1rem;
+        font-size: 1rem;
     }
     
     .hero-tagline {
-        font-size: 1rem;
-    }
-    
-    .hero-slide p {
         font-size: 0.95rem;
     }
     
+    .hero-slide p {
+        font-size: 0.9rem;
+        line-height: 1.6;
+    }
+    
     .hero-slide .btn {
-        padding: 12px 30px;
+        padding: 10px 25px;
+        font-size: 0.95rem;
+    }
+    
+    .categories-section h2 {
+        font-size: 1.5rem;
+        padding: 20px 15px 10px !important;
+    }
+    
+    .categories-grid {
+        grid-template-columns: 1fr;
+        padding: 10px;
+    }
+    
+    .category-card h3 {
+        font-size: 1.1rem;
+        padding: 12px;
+    }
+    
+    .product-list {
+        padding: 15px;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+    }
+    
+    .product-card {
+        padding: 10px;
+    }
+    
+    .product-card img {
+        height: 150px;
+    }
+    
+    .product-card h3 {
+        font-size: 0.95rem;
+    }
+    
+    .product-card .price {
+        font-size: 1.1rem;
+    }
+    
+    .product-card button {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+    }
+    
+    .featured-products {
+        padding: 10px;
+    }
+    
+    .slider-container .product-card {
+        min-width: 180px;
+    }
+    
+    .view-all-btn {
         font-size: 1rem;
+        padding: 10px 25px;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 15px;
+    }
+    
+    .modal-content img {
+        max-height: 300px;
+    }
+    
+    .modal-content h2 {
+        font-size: 1.3rem;
+    }
+    
+    .modal-content .price {
+        font-size: 1.3rem;
+    }
+    
+    .close {
+        font-size: 24px;
+        right: 10px;
+        top: 10px;
+    }
+    
+    .about-content h1 {
+        font-size: 1.8rem;
+    }
+    
+    .about-content h2 {
+        font-size: 1.4rem;
+    }
+    
+    .about-content .intro {
+        font-size: 1rem;
+    }
+    
+    .about-content p {
+        font-size: 0.95rem;
+        text-align: left;
+    }
+    
+    .philosophy-card {
+        padding: 1.2rem;
+    }
+    
+    .philosophy-card i {
+        font-size: 2rem;
+    }
+    
+    .philosophy-card h3 {
+        font-size: 1.1rem;
+    }
+    
+    .product-categories li {
+        padding: 0.8rem;
+        font-size: 0.9rem;
+    }
+    
+    .commitment-list li {
+        font-size: 0.95rem;
+        padding: 0.6rem 0;
+    }
+    
+    .closing {
+        font-size: 1rem;
+        padding: 1.2rem;
+    }
+    
+    .contact h1 {
+        font-size: 1.8rem;
+    }
+    
+    .whatsapp-icon {
+        padding: 0.8rem 1.5rem;
+    }
+    
+    .whatsapp-icon i {
+        font-size: 2rem;
+    }
+    
+    .form-group input,
+    .form-group textarea {
+        padding: 0.7rem;
+        font-size: 0.95rem;
+    }
+    
+    .btn {
+        padding: 0.7rem 1.5rem;
+        font-size: 0.95rem;
+    }
+    
+    .social-media {
+        gap: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .social-link {
+        width: 45px;
+        height: 45px;
+        font-size: 1.1rem;
+    }
+    
+    footer p {
+        font-size: 0.85rem;
+        padding: 0 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    nav h2 img {
+        height: 40px;
+    }
+    
+    nav > div {
+        width: 85%;
+    }
+    
+    nav a {
+        font-size: 1.1rem;
+        padding: 12px 15px;
+    }
+    
+    .hero {
+        padding: 30px 10px;
+        min-height: 60vh;
+    }
+    
+    .hero-text-slider {
+        min-height: 300px;
+    }
+    
+    .hero-slide {
+        padding: 1.2rem 0.8rem;
+    }
+    
+    .hero-slide h1 {
+        font-size: 1.5rem;
+    }
+    
+    .hero-slide h2 {
+        font-size: 1.3rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 0.9rem;
+    }
+    
+    .hero-slide p {
+        font-size: 0.85rem;
+    }
+    
+    .hero-slide .btn {
+        padding: 8px 20px;
+        font-size: 0.9rem;
+    }
+    
+    .categories-section h2 {
+        font-size: 1.3rem;
+    }
+    
+    .product-list {
+        grid-template-columns: 1fr;
+        padding: 10px;
+    }
+    
+    .slider-container .product-card {
+        min-width: 160px;
+    }
+    
+    .about-content h1 {
+        font-size: 1.5rem;
+    }
+    
+    .about-content h2 {
+        font-size: 1.2rem;
+    }
+    
+    .philosophy-cards {
+        gap: 1rem;
+    }
+    
+    .showcase-image {
+        height: 250px;
+    }
+}
+
+/* Landscape orientation for phones */
+@media (max-width: 968px) and (orientation: landscape) {
+    .hero {
+        min-height: auto;
+        padding: 60px 20px;
+    }
+    
+    .hero-text-slider {
+        min-height: 300px;
+    }
+    
+    nav > div {
+        width: 50%;
     }
 }

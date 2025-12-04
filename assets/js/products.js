@@ -183,14 +183,23 @@ document.addEventListener('DOMContentLoaded', function() {
         allSliderProducts.forEach((product, i) => {
             const productCard = document.createElement('div');
             productCard.className = 'product-card';
+            const productIndex = products.findIndex(p => p.id === product.id);
             productCard.innerHTML = `
                 <img src="${product.image}" alt="${product.name}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22250%22 height=%22200%22%3E%3Crect fill=%22%23ddd%22 width=%22250%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2220%22 fill=%22%23999%22%3ENo Image%3C/text%3E%3C/svg%3E'">
                 <h3>${product.name}</h3>
                 <p class="cat">${product.category}</p>
                 <p class="price">${product.price}</p>
-                <button onclick="openProduct(${product.id - 1})">View Details</button>
+                <button type="button" class="view-details-btn" data-index="${productIndex}">View Details</button>
             `;
             sliderContainer.appendChild(productCard);
+        });
+        
+        // Add event listeners to slider buttons
+        document.querySelectorAll('.slider-container .view-details-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const index = parseInt(this.getAttribute('data-index'));
+                openProduct(index);
+            });
         });
     }
     
@@ -206,32 +215,112 @@ document.addEventListener('DOMContentLoaded', function() {
                 <h3>${product.name}</h3>
                 <p class="cat">${product.category}</p>
                 <p class="price">${product.price}</p>
-                <button onclick="openProduct(${i})">View Details</button>
+                <button type="button" class="view-details-btn" data-index="${i}">View Details</button>
             `;
             container.appendChild(productCard);
         });
+        
+        // Add event listeners to grid buttons
+        document.querySelectorAll('.product-list .view-details-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const index = parseInt(this.getAttribute('data-index'));
+                openProduct(index);
+            });
+        });
     }
 });
+
+function openProduct(i) {
+    if (typeof products === 'undefined' || !products[i]) {
+        console.error('Product not found at index:', i);
+        return;
+    }
+    
+    const p = products[i];
+    const modal = document.querySelector(".modal");
+    
+    if (!modal) {
+        console.error('Modal element not found');
+        return;
+    }
+    
+    modal.innerHTML = `
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <img src="${p.image}" alt="${p.name}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%23ddd%22 width=%22400%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2220%22 fill=%22%23999%22%3ENo Image%3C/text%3E%3C/svg%3E'">
+            <h2>${p.name}</h2>
+            <p class="cat">${p.category}</p>
+            <p>${p.description}</p>
+            <p class="price">${p.price}</p>
+            <button type="button" class="btn add-to-cart-btn" data-id="${p.id}">Add to Cart</button>
+        </div>
+    `;
+    modal.style.display = "block";
+    
+    // Add event listener to the Add to Cart button
+    const addToCartBtn = modal.querySelector('.add-to-cart-btn');
+    if (addToCartBtn) {
+        addToCartBtn.addEventListener('click', function() {
+            const productId = parseInt(this.getAttribute('data-id'));
+            addToCart(productId);
+        });
+    }
+    
+    // Close modal when clicking outside
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+}
+
+function closeModal() {
+    const modal = document.querySelector(".modal");
+    if (modal) {
+        modal.style.display = "none";
+    }
+}
 
 function toggleAllProducts() {
     const productList = document.querySelector('.product-list');
     const featuredSection = document.querySelector('.featured-products');
     const button = document.querySelector('.view-all-btn');
     
-    if (productList.style.display === 'none') {
+    if (!productList || !featuredSection || !button) {
+        console.error('Required elements not found');
+        return;
+    }
+    
+    if (productList.style.display === 'none' || productList.style.display === '') {
         productList.style.display = 'grid';
         featuredSection.style.display = 'none';
         button.textContent = 'Show Featured Products';
-        button.onclick = function() {
-            productList.style.display = 'none';
-            featuredSection.style.display = 'block';
-            button.textContent = 'View All Products';
-            button.onclick = toggleAllProducts;
-        };
+    } else {
+        productList.style.display = 'none';
+        featuredSection.style.display = 'block';
+        button.textContent = 'View All Products';
+        
+        // Scroll to top of products section
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
     }
 }
 
 function addToCart(productId) {
     const product = products.find(p => p.id === productId);
-    alert(`${product.name} added to cart!`);
+    if (!product) {
+        alert('Product not found!');
+        return;
+    }
+    
+    alert(`${product.name} added to cart!\n\nPrice: ${product.price}\n\nThank you for shopping with WAYMOORE!`);
+    closeModal();
 }
+
+// Make functions globally available
+window.openProduct = openProduct;
+window.closeModal = closeModal;
+window.toggleAllProducts = toggleAllProducts;
+window.addToCart = addToCart;
