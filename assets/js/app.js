@@ -1,20 +1,20 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
     console.log('App.js loaded');
-
-    // Mobile menu toggle - ALWAYS create it
+    
+    // Mobile menu toggle - MUST be first
     createMobileMenu();
-
+    
     // Handle contact form submission
     const contactForm = document.getElementById('contact-form');
-
+    
     if (contactForm) {
-        contactForm.addEventListener('submit', function (e) {
+        contactForm.addEventListener('submit', function(e) {
             e.preventDefault();
-
+            
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
             const message = document.getElementById('message').value;
-
+            
             if (name && email && message) {
                 alert(`Thank you, ${name}!\n\nYour message has been received. We will get back to you soon at ${email}.`);
                 contactForm.reset();
@@ -23,11 +23,11 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-
+    
     // Highlight active navigation link
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
     const navLinks = document.querySelectorAll('nav a');
-
+    
     navLinks.forEach(link => {
         const href = link.getAttribute('href');
         if (href === currentPage) {
@@ -35,14 +35,10 @@ document.addEventListener('DOMContentLoaded', function () {
             link.style.paddingBottom = '5px';
         }
     });
-
+    
     // Log page info for debugging
     console.log('Current page:', currentPage);
-    console.log('User logged in:', AuthManager ? AuthManager.isLoggedIn() : false);
-    if (AuthManager && AuthManager.isLoggedIn()) {
-        const user = AuthManager.getCurrentUser();
-        console.log('User cart items:', user.cart ? user.cart.length : 0);
-    }
+    console.log('User logged in:', AuthManager && AuthManager.isLoggedIn ? AuthManager.isLoggedIn() : false);
 });
 
 function createMobileMenu() {
@@ -51,89 +47,82 @@ function createMobileMenu() {
         console.error('Nav element not found');
         return;
     }
-
+    
     const navDiv = nav.querySelector('div');
     if (!navDiv) {
         console.error('Nav div not found');
         return;
     }
-
+    
     // Check if toggle button already exists
-    let toggleButton = nav.querySelector('.mobile-menu-toggle');
-
-    if (!toggleButton) {
-        // Create mobile menu toggle button
-        toggleButton = document.createElement('button');
-        toggleButton.className = 'mobile-menu-toggle';
-        toggleButton.innerHTML = '<i class="fas fa-bars"></i>';
-        toggleButton.setAttribute('aria-label', 'Toggle menu');
-        toggleButton.setAttribute('type', 'button');
-
-        // Insert toggle button before nav div
-        nav.insertBefore(toggleButton, navDiv);
-        console.log('Mobile menu button created');
+    if (nav.querySelector('.mobile-menu-toggle')) {
+        console.log('Mobile menu toggle already exists');
+        return;
     }
-
+    
+    // Create mobile menu toggle button with three lines
+    const toggleButton = document.createElement('button');
+    toggleButton.className = 'mobile-menu-toggle';
+    toggleButton.innerHTML = '<i class="fas fa-bars"></i>';
+    toggleButton.setAttribute('aria-label', 'Toggle menu');
+    toggleButton.setAttribute('type', 'button');
+    
+    // Insert toggle button before nav div
+    nav.insertBefore(toggleButton, navDiv);
+    
+    console.log('Mobile menu toggle created');
+    
     // Toggle menu on button click
-    toggleButton.addEventListener('click', function (e) {
+    toggleButton.addEventListener('click', function(e) {
+        e.preventDefault();
         e.stopPropagation();
+        
         const isActive = navDiv.classList.toggle('active');
-
-        console.log('Menu toggled:', isActive);
-
-        // Change icon
+        console.log('Menu toggled, active:', isActive);
+        
+        // Change icon between hamburger (bars) and close (X)
         const icon = toggleButton.querySelector('i');
         if (isActive) {
             icon.className = 'fas fa-times';
-            document.body.style.overflow = 'hidden'; // Prevent scrolling
-
-            // Add entrance animation to links
-            const links = navDiv.querySelectorAll('a');
-            links.forEach((link, index) => {
-                link.style.opacity = '0';
-                link.style.transform = 'translateX(-20px)';
-                setTimeout(() => {
-                    link.style.transition = 'all 0.3s ease';
-                    link.style.opacity = '1';
-                    link.style.transform = 'translateX(0)';
-                }, 100 * index);
-            });
+            document.body.style.overflow = 'hidden'; // Prevent scrolling when menu open
         } else {
             icon.className = 'fas fa-bars';
             document.body.style.overflow = ''; // Restore scrolling
         }
     });
-
+    
     // Close menu when clicking a link
     const navLinks = navDiv.querySelectorAll('a');
     navLinks.forEach(link => {
-        link.addEventListener('click', function () {
+        link.addEventListener('click', function() {
+            console.log('Nav link clicked, closing menu');
             navDiv.classList.remove('active');
-            const icon = toggleButton.querySelector('i');
-            if (icon) icon.className = 'fas fa-bars';
+            toggleButton.querySelector('i').className = 'fas fa-bars';
             document.body.style.overflow = '';
         });
     });
-
+    
     // Close menu when clicking outside
-    document.addEventListener('click', function (e) {
+    document.addEventListener('click', function(e) {
         if (!nav.contains(e.target) && navDiv.classList.contains('active')) {
+            console.log('Clicked outside, closing menu');
             navDiv.classList.remove('active');
-            const icon = toggleButton.querySelector('i');
-            if (icon) icon.className = 'fas fa-bars';
+            toggleButton.querySelector('i').className = 'fas fa-bars';
             document.body.style.overflow = '';
         }
     });
-
+    
     // Handle escape key
-    document.addEventListener('keydown', function (e) {
+    document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && navDiv.classList.contains('active')) {
+            console.log('Escape pressed, closing menu');
             navDiv.classList.remove('active');
-            const icon = toggleButton.querySelector('i');
-            if (icon) icon.className = 'fas fa-bars';
+            toggleButton.querySelector('i').className = 'fas fa-bars';
             document.body.style.overflow = '';
         }
     });
+    
+    console.log('Mobile menu fully initialized');
 }
 
 function openProduct(i) {
