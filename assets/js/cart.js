@@ -3,6 +3,19 @@ const CartManager = {
         this.updateCartUI();
         this.displayCartItems();
         this.setupCheckout();
+        
+        // Listen for storage changes (for multi-tab sync)
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'waymoreCurrentUser') {
+                this.updateCartUI();
+                this.displayCartItems();
+            }
+        });
+        
+        // Set up periodic refresh to catch any updates
+        setInterval(() => {
+            this.updateCartUI();
+        }, 1000); // Update every second
     },
 
     addToCart(productId) {
@@ -31,7 +44,7 @@ const CartManager = {
         
         if (cartItem) {
             cartItem.quantity += 1;
-            alert(`${product.name} quantity increased to ${cartItem.quantity}!`);
+            alert(`${product.name} quantity increased to ${cartItem.quantity}!\n\nUpdated cart total: ₵${this.calculateCartTotal(users[userIndex].cart).toFixed(2)}`);
         } else {
             users[userIndex].cart.push({
                 productId: product.id,
@@ -48,12 +61,23 @@ const CartManager = {
         localStorage.setItem('waymoreUsers', JSON.stringify(users));
         localStorage.setItem('waymoreCurrentUser', JSON.stringify(users[userIndex]));
 
+        // Force immediate update
         this.updateCartUI();
+        this.displayCartItems();
         this.showQuickCartSummary();
         
         if (typeof closeModal === 'function') {
             closeModal();
         }
+    },
+
+    calculateCartTotal(cart) {
+        let total = 0;
+        cart.forEach(item => {
+            const price = parseFloat(item.price.replace('₵', ''));
+            total += price * item.quantity;
+        });
+        return total;
     },
 
     showQuickCartSummary() {
@@ -140,10 +164,18 @@ const CartManager = {
         
         if (userIndex === -1) return;
 
+        // Find the item being removed for notification
+        const removedItem = users[userIndex].cart.find(item => item.productId === productId);
+        
         users[userIndex].cart = users[userIndex].cart.filter(item => item.productId !== productId);
 
         localStorage.setItem('waymoreUsers', JSON.stringify(users));
         localStorage.setItem('waymoreCurrentUser', JSON.stringify(users[userIndex]));
+
+        if (removedItem) {
+            const newTotal = this.calculateCartTotal(users[userIndex].cart);
+            alert(`${removedItem.name} removed from cart.\n\nUpdated total: ₵${newTotal.toFixed(2)}`);
+        }
 
         this.updateCartUI();
         this.displayCartItems();
@@ -171,6 +203,7 @@ const CartManager = {
             localStorage.setItem('waymoreUsers', JSON.stringify(users));
             localStorage.setItem('waymoreCurrentUser', JSON.stringify(users[userIndex]));
 
+            // Immediately update all displays
             this.updateCartUI();
             this.displayCartItems();
         }
@@ -180,21 +213,14 @@ const CartManager = {
         if (!AuthManager.isLoggedIn()) return 0;
 
         const user = AuthManager.getCurrentUser();
-        let total = 0;
-
-        user.cart.forEach(item => {
-            const price = parseFloat(item.price.replace('₵', ''));
-            total += price * item.quantity;
-        });
-
-        return total;
+        return this.calculateCartTotal(user.cart || []);
     },
 
     getItemCount() {
         if (!AuthManager.isLoggedIn()) return 0;
         
         const user = AuthManager.getCurrentUser();
-        return user.cart.reduce((sum, item) => sum + item.quantity, 0);
+        return (user.cart || []).reduce((sum, item) => sum + item.quantity, 0);
     },
 
     updateCartUI() {
@@ -212,6 +238,11 @@ const CartManager = {
                 el.textContent = '0';
                 el.style.display = 'none';
             });
+        }
+        
+        // Update cart summary if on cart page
+        if (window.location.pathname.includes('cart.html')) {
+            this.updateCartSummary();
         }
     },
 
@@ -232,7 +263,7 @@ const CartManager = {
 
         const user = AuthManager.getCurrentUser();
 
-        if (user.cart.length === 0) {
+        if (!user.cart || user.cart.length === 0) {
             cartItemsContainer.innerHTML = `
                 <div class="empty-cart">
                     <i class="fas fa-shopping-cart" style="font-size: 4rem; color: #d1d5db; margin-bottom: 1rem;"></i>
@@ -281,11 +312,11 @@ const CartManager = {
                             <div class="cart-item-quantity">
                                 <label>Quantity:</label>
                                 <div class="quantity-controls">
-                                    <button class="qty-btn" onclick="CartManager.updateQuantity(${item.productId}, -1)" title="Decrease quantity">
+                                    <button class="qty-btn" onclick="CartManager.updateQuantity(${item.productId}, -1); CartManager.updateCartSummary();" title="Decrease quantity">
                                         <i class="fas fa-minus"></i>
                                     </button>
                                     <span class="quantity-display">${item.quantity}</span>
-                                    <button class="qty-btn" onclick="CartManager.updateQuantity(${item.productId}, 1)" title="Increase quantity">
+                                    <button class="qty-btn" onclick="CartManager.updateQuantity(${item.productId}, 1); CartManager.updateCartSummary();" title="Increase quantity">
                                         <i class="fas fa-plus"></i>
                                     </button>
                                 </div>
@@ -315,6 +346,7 @@ const CartManager = {
         const shipping = subtotal > 0 ? 10 : 0;
         const total = subtotal + shipping;
 
+        // Update main summary elements
         const subtotalEl = document.getElementById('cart-subtotal');
         const shippingEl = document.getElementById('cart-shipping');
         const totalEl = document.getElementById('cart-total');
@@ -337,7 +369,7 @@ const CartManager = {
 
         // Update product list in summary with detailed breakdown
         const summaryProductList = document.getElementById('summary-product-list');
-        if (summaryProductList && user && user.cart.length > 0) {
+        if (summaryProductList && user && user.cart && user.cart.length > 0) {
             let productListHTML = `
                 <div class="summary-products">
                     <h3><i class="fas fa-list"></i> Order Items:</h3>
@@ -364,52 +396,93 @@ const CartManager = {
 
             productListHTML += `</div>`;
             summaryProductList.innerHTML = productListHTML;
+        } else if (summaryProductList) {
+            summaryProductList.innerHTML = '';
+        }
+
+        // Also update header stats if they exist
+        const headerStats = document.querySelector('.cart-stats');
+        if (headerStats) {
+            headerStats.innerHTML = `
+                <span class="stat-badge">${uniqueProducts} ${uniqueProducts === 1 ? 'Product' : 'Products'}</span>
+                <span class="stat-badge">${itemCount} ${itemCount === 1 ? 'Item' : 'Items'}</span>
+                <span class="stat-badge total">Total: ₵${subtotal.toFixed(2)}</span>
+            `;
         }
     },
 
     setupCheckout() {
         const checkoutBtn = document.getElementById('checkout-btn');
-        if (!checkoutBtn) return;
+        if (!checkoutBtn) {
+            console.error('Checkout button not found!');
+            return;
+        }
 
-        checkoutBtn.addEventListener('click', () => {
+        console.log('Checkout button found and event listener attached');
+
+        checkoutBtn.addEventListener('click', (e) => {
+            e.preventDefault(); // Prevent any default behavior
+            
+            console.log('Checkout button clicked');
+            
             if (!AuthManager.isLoggedIn()) {
-                alert('Please login to checkout!');
+                alert('⚠️ Please login to checkout!\n\nYou need to be logged in to complete your purchase.');
                 window.location.href = 'login.html';
                 return;
             }
 
             const user = AuthManager.getCurrentUser();
+            console.log('User cart:', user.cart);
             
             if (!user.cart || user.cart.length === 0) {
-                alert('Your cart is empty! Add some products first.');
+                alert('⚠️ Your cart is empty!\n\nPlease add some products to your cart before checking out.');
                 window.location.href = 'products.html';
                 return;
             }
 
-            // Show loading/confirmation
+            // Calculate totals
             const subtotal = this.getCartTotal();
             const shipping = 10;
             const total = subtotal + shipping;
             const itemCount = this.getItemCount();
             
-            const confirmMessage = `Ready to checkout?\n\n` +
-                `Items: ${user.cart.length} products (${itemCount} items)\n` +
-                `Total: ₵${total.toFixed(2)}\n\n` +
+            // Show confirmation before proceeding
+            const confirmMessage = 
+                `🛍️ Ready to checkout?\n\n` +
+                `📦 Products: ${user.cart.length}\n` +
+                `🔢 Total Items: ${itemCount}\n` +
+                `💰 Total Amount: ₵${total.toFixed(2)}\n\n` +
                 `Click OK to proceed to checkout page.`;
 
             if (confirm(confirmMessage)) {
+                console.log('User confirmed, redirecting to checkout...');
+                
                 // Save cart summary to sessionStorage for checkout page
                 sessionStorage.setItem('checkoutData', JSON.stringify({
                     cart: user.cart,
                     subtotal: subtotal,
                     shipping: shipping,
                     total: total,
-                    itemCount: itemCount
+                    itemCount: itemCount,
+                    timestamp: Date.now()
                 }));
                 
-                // Redirect to checkout page
-                window.location.href = 'checkout.html';
+                // Add a small delay to ensure storage is saved
+                setTimeout(() => {
+                    window.location.href = 'checkout.html';
+                }, 100);
+            } else {
+                console.log('User cancelled checkout');
             }
+        });
+        
+        // Also add a visual feedback on hover
+        checkoutBtn.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+        });
+        
+        checkoutBtn.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
         });
     },
 
@@ -418,54 +491,3 @@ const CartManager = {
         const users = JSON.parse(localStorage.getItem('waymoreUsers') || '[]');
         const userIndex = users.findIndex(u => u.id === user.id);
         
-        if (userIndex === -1) return;
-
-        const order = {
-            id: Date.now(),
-            date: new Date().toISOString(),
-            items: [...user.cart],
-            subtotal: this.getCartTotal(),
-            shipping: 10,
-            total: total,
-            status: 'Pending',
-            itemCount: this.getItemCount()
-        };
-
-        users[userIndex].orders = users[userIndex].orders || [];
-        users[userIndex].orders.push(order);
-        users[userIndex].cart = [];
-
-        localStorage.setItem('waymoreUsers', JSON.stringify(users));
-        localStorage.setItem('waymoreCurrentUser', JSON.stringify(users[userIndex]));
-
-        // Create detailed order message
-        let orderDetails = `Order Placed Successfully!\n\n`;
-        orderDetails += `Order ID: ${order.id}\n`;
-        orderDetails += `Date: ${new Date(order.date).toLocaleString()}\n\n`;
-        orderDetails += `Items Ordered:\n`;
-        
-        order.items.forEach(item => {
-            const itemPrice = parseFloat(item.price.replace('₵', ''));
-            const itemTotal = itemPrice * item.quantity;
-            orderDetails += `• ${item.name} (×${item.quantity}): ₵${itemTotal.toFixed(2)}\n`;
-        });
-        
-        orderDetails += `\nTotal Items: ${order.itemCount}\n`;
-        orderDetails += `Total Amount: ₵${total.toFixed(2)}\n\n`;
-        orderDetails += `We'll contact you shortly via WhatsApp (${user.phone || '0592805834'}) to confirm your order.\n\n`;
-        orderDetails += `Thank you for choosing WAYMOORE!`;
-
-        alert(orderDetails);
-        
-        this.updateCartUI();
-        window.location.href = 'products.html';
-    }
-};
-
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', () => {
-    CartManager.init();
-});
-
-// Make CartManager globally available
-window.CartManager = CartManager;

@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('App.js loaded');
+    
     // Mobile menu toggle
     createMobileMenu();
     
@@ -33,6 +35,14 @@ document.addEventListener('DOMContentLoaded', function() {
             link.style.paddingBottom = '5px';
         }
     });
+    
+    // Log page info for debugging
+    console.log('Current page:', currentPage);
+    console.log('User logged in:', AuthManager.isLoggedIn());
+    if (AuthManager.isLoggedIn()) {
+        const user = AuthManager.getCurrentUser();
+        console.log('User cart items:', user.cart ? user.cart.length : 0);
+    }
 
     // Product display functionality
     const productContainer = document.querySelector(".product-list");
