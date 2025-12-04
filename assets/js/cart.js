@@ -19,32 +19,55 @@ const CartManager = {
     },
 
     addToCart(productId) {
-        if (!AuthManager.isLoggedIn()) {
-            alert('⚠️ Please login to add items to cart!\n\nYou need to create an account or login to start shopping.');
+        console.log('CartManager.addToCart called with ID:', productId);
+        
+        if (!AuthManager || !AuthManager.isLoggedIn()) {
+            console.log('User not logged in');
+            alert('🔐 Please login to add items to cart!\n\nYou need an account to save your cart items.');
             window.location.href = 'login.html';
             return;
         }
 
         const user = AuthManager.getCurrentUser();
+        console.log('Current user:', user ? user.email : 'none');
+        
+        // Ensure products array exists
+        if (typeof products === 'undefined' || !products) {
+            console.error('Products array not found');
+            alert('Product catalog not loaded. Please refresh the page.');
+            return;
+        }
+        
         const product = products.find(p => p.id === productId);
         
         if (!product) {
-            alert('❌ Product not found!');
+            console.error('Product not found with ID:', productId);
+            alert('Product not found!');
             return;
         }
+
+        console.log('Adding product to cart:', product.name);
 
         // Get user's cart
         const users = JSON.parse(localStorage.getItem('waymoreUsers') || '[]');
         const userIndex = users.findIndex(u => u.id === user.id);
         
-        if (userIndex === -1) return;
+        if (userIndex === -1) {
+            console.error('User not found in database');
+            return;
+        }
+
+        // Initialize cart if it doesn't exist
+        if (!users[userIndex].cart) {
+            users[userIndex].cart = [];
+        }
 
         // Check if product already in cart
         const cartItem = users[userIndex].cart.find(item => item.productId === productId);
         
         if (cartItem) {
             cartItem.quantity += 1;
-            alert(`✅ ${product.name}\n\nQuantity increased to ${cartItem.quantity}!\n\nCart Total: ₵${this.calculateCartTotal(users[userIndex].cart).toFixed(2)}`);
+            console.log(`Increased quantity to ${cartItem.quantity}`);
         } else {
             users[userIndex].cart.push({
                 productId: product.id,
@@ -54,35 +77,27 @@ const CartManager = {
                 category: product.category || 'Product',
                 quantity: 1
             });
-            alert(`✅ ${product.name} added to cart!\n\n💰 Price: ${product.price}\n\n🛒 View your cart to see all items and checkout.`);
+            console.log('Added new item to cart');
         }
 
         // Update storage
         localStorage.setItem('waymoreUsers', JSON.stringify(users));
         localStorage.setItem('waymoreCurrentUser', JSON.stringify(users[userIndex]));
 
-        // Force immediate update of cart badge
+        const itemTotal = this.calculateCartTotal(users[userIndex].cart);
+        const message = cartItem 
+            ? `✅ ${product.name}\n\nQuantity increased to ${cartItem.quantity}\n\nCart Total: ₵${itemTotal.toFixed(2)}`
+            : `✅ ${product.name}\n\nAdded to cart!\n\nPrice: ${product.price}\n\nCart Total: ₵${itemTotal.toFixed(2)}`;
+        
+        alert(message);
+
+        // Force immediate update
         this.updateCartUI();
-        
-        // Also update the display if on cart page
-        if (window.location.pathname.includes('cart.html')) {
-            this.displayCartItems();
-        }
-        
+        this.displayCartItems();
         this.showQuickCartSummary();
         
         if (typeof closeModal === 'function') {
             closeModal();
-        }
-        
-        // Scroll to cart icon briefly
-        const cartLink = document.querySelector('.cart-link');
-        if (cartLink) {
-            cartLink.style.transition = 'transform 0.3s ease';
-            cartLink.style.transform = 'scale(1.3)';
-            setTimeout(() => {
-                cartLink.style.transform = 'scale(1)';
-            }, 300);
         }
     },
 

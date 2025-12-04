@@ -466,17 +466,28 @@ function openProduct(i) {
             <p class="cat">${p.category}</p>
             <p>${p.description}</p>
             <p class="price">${p.price}</p>
-            <button type="button" class="btn add-to-cart-btn" data-id="${p.id}">Add to Cart</button>
+            <button type="button" class="btn add-to-cart-btn" id="modal-add-to-cart-${p.id}">
+                <i class="fas fa-shopping-cart"></i> Add to Cart
+            </button>
         </div>
     `;
     modal.style.display = "block";
     
     // Add event listener to the Add to Cart button
-    const addToCartBtn = modal.querySelector('.add-to-cart-btn');
+    const addToCartBtn = document.getElementById(`modal-add-to-cart-${p.id}`);
     if (addToCartBtn) {
-        addToCartBtn.addEventListener('click', function() {
-            const productId = parseInt(this.getAttribute('data-id'));
-            addToCart(productId);
+        addToCartBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Add to cart clicked for product:', p.id);
+            
+            // Check if CartManager exists
+            if (typeof CartManager !== 'undefined' && CartManager.addToCart) {
+                CartManager.addToCart(p.id);
+            } else {
+                console.error('CartManager not available');
+                alert('Cart system not loaded. Please refresh the page and try again.');
+            }
         });
     }
     
@@ -523,6 +534,14 @@ function toggleAllProducts() {
 }
 
 function addToCart(productId) {
+    console.log('addToCart function called with ID:', productId);
+    
+    if (typeof CartManager === 'undefined') {
+        console.error('CartManager not loaded');
+        alert('Cart system is not ready. Please refresh the page.');
+        return;
+    }
+    
     CartManager.addToCart(productId);
 }
 
