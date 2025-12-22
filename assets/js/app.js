@@ -79,23 +79,43 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-function openProduct(i) {
-    const p = products[i];
-    const modal = document.querySelector(".modal");
-    modal.innerHTML = `
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <img src="${p.image}" alt="${p.name}">
-            <h2>${p.name}</h2>
-            <p class="cat">${p.category}</p>
-            <p>${p.description}</p>
-            <p class="price">${p.price}</p>
-            <button class="btn" onclick="addToCart(${p.id})">Add to Cart</button>
-        </div>
-    `;
-    modal.style.display = "block";
-}
+(function() {
+	const hamburger = document.getElementById('hamburger');
+	const navLinks = document.getElementById('navLinks');
 
-function closeModal() {
-    document.querySelector(".modal").style.display = "none";
-}
+	if (!hamburger || !navLinks) return;
+
+	function closeMenu() {
+		hamburger.classList.remove('open');
+		navLinks.classList.remove('active');
+		hamburger.setAttribute('aria-expanded', 'false');
+		document.body.style.overflow = '';
+	}
+
+	function openMenu() {
+		hamburger.classList.add('open');
+		navLinks.classList.add('active');
+		hamburger.setAttribute('aria-expanded', 'true');
+		// prevent body scrolling when menu open on small screens
+		document.body.style.overflow = 'hidden';
+	}
+
+	hamburger.addEventListener('click', function(e) {
+		const expanded = hamburger.classList.contains('open');
+		if (expanded) closeMenu();
+		else openMenu();
+	});
+
+	// close when a link is clicked
+	navLinks.addEventListener('click', function(e) {
+		const target = e.target.closest('a');
+		if (!target) return;
+		// close the menu after navigation click (keeps behavior consistent)
+		if (window.innerWidth <= 768) closeMenu();
+	});
+
+	// if resizing to desktop, ensure menu is closed
+	window.addEventListener('resize', function() {
+		if (window.innerWidth > 768) closeMenu();
+	});
+})();
