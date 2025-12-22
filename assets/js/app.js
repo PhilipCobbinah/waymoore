@@ -8,36 +8,29 @@ document.addEventListener('DOMContentLoaded', function() {
     const navLinks = document.getElementById('navLinks');
     
     if (hamburger && navLinks) {
-        // Toggle menu on hamburger click
+        const setMenuState = (open) => {
+            navLinks.classList.toggle('active', open);
+            hamburger.classList.toggle('open', open);
+            hamburger.setAttribute('aria-expanded', open ? 'true' : 'false');
+        };
+
+        // Toggle menu on button click (first click shows menu)
         hamburger.addEventListener('click', function(e) {
             e.stopPropagation();
-            hamburger.classList.toggle('active');
-            navLinks.classList.toggle('active');
+            setMenuState(!navLinks.classList.contains('active'));
         });
         
-        // Close menu when clicking on a link
-        const links = navLinks.querySelectorAll('a');
-        links.forEach(link => {
-            link.addEventListener('click', function() {
-                hamburger.classList.remove('active');
-                navLinks.classList.remove('active');
-            });
+        // Close when a link inside nav is clicked
+        navLinks.addEventListener('click', function(e) {
+            if (e.target.closest('a')) setMenuState(false);
         });
         
-        // Close menu when clicking outside
-        document.addEventListener('click', function(event) {
-            if (!hamburger.contains(event.target) && !navLinks.contains(event.target)) {
-                hamburger.classList.remove('active');
-                navLinks.classList.remove('active');
-            }
+        // Close when clicking outside nav or on Escape
+        document.addEventListener('click', function(e) {
+            if (!navLinks.contains(e.target) && !hamburger.contains(e.target)) setMenuState(false);
         });
-        
-        // Close menu on Escape key
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape' && navLinks.classList.contains('active')) {
-                hamburger.classList.remove('active');
-                navLinks.classList.remove('active');
-            }
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') setMenuState(false);
         });
         
         console.log('✓ Hamburger menu initialized');
@@ -78,44 +71,3 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-
-(function() {
-	const hamburger = document.getElementById('hamburger');
-	const navLinks = document.getElementById('navLinks');
-
-	if (!hamburger || !navLinks) return;
-
-	function closeMenu() {
-		hamburger.classList.remove('open');
-		navLinks.classList.remove('active');
-		hamburger.setAttribute('aria-expanded', 'false');
-		document.body.style.overflow = '';
-	}
-
-	function openMenu() {
-		hamburger.classList.add('open');
-		navLinks.classList.add('active');
-		hamburger.setAttribute('aria-expanded', 'true');
-		// prevent body scrolling when menu open on small screens
-		document.body.style.overflow = 'hidden';
-	}
-
-	hamburger.addEventListener('click', function(e) {
-		const expanded = hamburger.classList.contains('open');
-		if (expanded) closeMenu();
-		else openMenu();
-	});
-
-	// close when a link is clicked
-	navLinks.addEventListener('click', function(e) {
-		const target = e.target.closest('a');
-		if (!target) return;
-		// close the menu after navigation click (keeps behavior consistent)
-		if (window.innerWidth <= 768) closeMenu();
-	});
-
-	// if resizing to desktop, ensure menu is closed
-	window.addEventListener('resize', function() {
-		if (window.innerWidth > 768) closeMenu();
-	});
-})();
