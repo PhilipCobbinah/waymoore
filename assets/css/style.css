@@ -94,7 +94,7 @@ header {
             padding: 80px 0 2rem 0;
             box-shadow: -5px 0 20px rgba(0,0,0,0.15);
             transition: right 0.3s cubic-bezier(0.4,0,0.2,1);
-            z-index: 100;
+            z-index: 1100;
         }
         .nav-links.active {
             right: 0;
@@ -111,16 +111,17 @@ header {
         }
     }
 
-    /* ===== OVERRIDE: Hide old nav > div structure (deprecated) ===== */
-    nav > div {
+    /* ===== OVERRIDE: Hide legacy nav divs (deprecated), but keep modern .nav-links visible ===== */
+    /* Hide only legacy nav > div that are not the .nav-links element */
+    nav > div:not(.nav-links) {
         display: none !important;
     }
-    
-    nav > div.active {
-        display: none !important;
-        right: auto !important;
+
+    /* Ensure the modern navigation container stays visible and uses expected display */
+    nav > div.nav-links {
+        display: flex !important;
     }
-    
+
     /* ===== OVERRIDE: Hide old mobile menu toggle ===== */
     .mobile-menu-toggle {
         display: none !important;
