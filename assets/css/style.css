@@ -120,6 +120,7 @@ header {
         }
         .nav-links.active {
             right: 0;
+            display: flex;
         }
         .nav-links a {
             width: 100%;
@@ -127,6 +128,13 @@ header {
             font-size: 1.2rem;
             padding: 18px 32px;
             border-bottom: 1px solid rgba(255,255,255,0.12);
+            color: #1f2937; /* dark, readable on white */
+        }
+        .nav-links a:hover,
+        .nav-links a:focus {
+            background: rgba(16,185,129,0.06);
+            color: #10b981;
+            outline: none;
         }
         .hamburger {
             display: flex;
@@ -1881,7 +1889,22 @@ footer p {
         font-size: 1.15rem;
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 968px) {
+	nav {
+		padding: 12px 16px;
+	}
+	/* ...existing code... */
+
+	/* ensure active state also forces the panel visible (useful for narrow devices) */
+	.nav-links.active {
+		right: 0;
+		display: flex;
+	}
+}
+
+/* ...existing code... */
+
+@media (max-width: 768px) {
 	nav {
 		position: relative;
 		display: flex;
@@ -1898,6 +1921,7 @@ footer p {
 		justify-content: center;
 	}
 
+	/* make mobile menu a white dropdown and ensure links are readable */
 	.nav-links {
 		position: absolute;
 		top: 100%;
@@ -1911,18 +1935,37 @@ footer p {
 		box-shadow: 0 6px 18px rgba(0,0,0,0.08);
 		z-index: 200;
 	}
-	.nav-links a{
+
+	/* visible state — ensure both display and (if present) right-positioning are applied */
+	.nav-links.active {
+		display: flex;
+		right: 0;
+	}
+
+	/* override desktop white link color so links show on white background */
+	.nav-links a {
 		padding: 0.75rem 0.5rem;
 		border-bottom: 1px solid rgba(0,0,0,0.06);
 		width: 100%;
 		display: block;
+		color: #1f2937; /* dark, readable on white */
 	}
+
 	.nav-links a:last-child{
 		border-bottom: none;
 	}
-	/* visible state */
-	.nav-links.active {
-		display: flex;
+
+	/* mobile hover / focus states */
+	.nav-links a:hover,
+	.nav-links a:focus {
+		background: rgba(16,185,129,0.06);
+		color: #10b981;
+		outline: none;
+	}
+
+	/* icons inside mobile links follow the link color */
+	.nav-links a i {
+		color: inherit;
 	}
 
 	/* ensure the cart/user icons are aligned */
