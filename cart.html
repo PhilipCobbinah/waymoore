@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shopping Cart - WAYMOORE</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/cart.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -15,7 +16,12 @@
                     <img src="assets/img/products/waymoore_logo.jpg" alt="Waymoore Logo">
                 </a>
             </h2>
-            <div>
+            <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <div class="nav-links" id="navLinks">
                 <a href="index.html">Home</a>
                 <a href="products.html">Products</a>
                 <a href="about.html">About</a>
@@ -42,12 +48,15 @@
                 
                 <div class="cart-summary">
                     <h2><i class="fas fa-receipt"></i> Order Summary</h2>
+                    
                     <div class="summary-item-info" id="summary-item-count">
                         <i class="fas fa-shopping-bag"></i>
-                        <span>0 items</span>
+                        <div>
+                            <span>0 items</span>
+                        </div>
                     </div>
                     
-                    <div id="summary-product-list"></div>
+                    <div class="summary-products" id="summary-product-list"></div>
                     
                     <div class="summary-divider"></div>
                     
@@ -63,20 +72,13 @@
                         <span><i class="fas fa-money-bill-wave"></i> Total:</span>
                         <span id="cart-total">₵0.00</span>
                     </div>
-                    <button class="btn checkout-btn" id="checkout-btn">
+                    
+                    <button class="checkout-btn" id="checkout-btn">
                         <i class="fas fa-lock"></i> Proceed to Checkout
                     </button>
-                    <a href="products.html" class="btn continue-shopping">
+                    <a href="products.html" class="continue-shopping">
                         <i class="fas fa-arrow-left"></i> Continue Shopping
                     </a>
-                    
-                    <!-- Debug info (remove in production) -->
-                    <div style="margin-top: 1rem; padding: 0.5rem; background: #f0f0f0; border-radius: 5px; font-size: 0.8rem; text-align: center;">
-                        <p style="margin: 0; color: #666;">
-                            <i class="fas fa-info-circle"></i> 
-                            Having issues? <a href="checkout.html" style="color: #10b981; text-decoration: underline;">Try direct link</a>
-                        </p>
-                    </div>
                 </div>
             </div>
         </section>
@@ -108,6 +110,7 @@
     </footer>
 
     <script src="assets/js/products.js"></script>
+    <script src="assets/js/auth.js"></script>
     <script src="assets/js/cart.js"></script>
     <script src="assets/js/app.js"></script>
 </body>

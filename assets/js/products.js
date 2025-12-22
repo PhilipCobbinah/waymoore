@@ -466,9 +466,14 @@ function openProduct(i) {
             <p class="cat">${p.category}</p>
             <p>${p.description}</p>
             <p class="price">${p.price}</p>
-            <button type="button" class="btn add-to-cart-btn" id="modal-add-to-cart-${p.id}">
-                <i class="fas fa-shopping-cart"></i> Add to Cart
-            </button>
+            <div class="modal-buttons">
+                <button type="button" class="btn add-to-cart-btn" id="modal-add-to-cart-${p.id}">
+                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                </button>
+                <button type="button" class="btn buy-now-btn" id="modal-buy-now-${p.id}">
+                    <i class="fas fa-bolt"></i> Buy Now
+                </button>
+            </div>
         </div>
     `;
     modal.style.display = "block";
@@ -484,6 +489,29 @@ function openProduct(i) {
             // Check if CartManager exists
             if (typeof CartManager !== 'undefined' && CartManager.addToCart) {
                 CartManager.addToCart(p.id);
+            } else {
+                console.error('CartManager not available');
+                alert('Cart system not loaded. Please refresh the page and try again.');
+            }
+        });
+    }
+    
+    // Add event listener to the Buy Now button
+    const buyNowBtn = document.getElementById(`modal-buy-now-${p.id}`);
+    if (buyNowBtn) {
+        buyNowBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Buy now clicked for product:', p.id);
+            
+            // Check if CartManager exists and add to cart
+            if (typeof CartManager !== 'undefined' && CartManager.addToCart) {
+                CartManager.addToCart(p.id);
+                // Close modal and redirect to checkout
+                closeModal();
+                setTimeout(() => {
+                    window.location.href = 'checkout.html';
+                }, 500);
             } else {
                 console.error('CartManager not available');
                 alert('Cart system not loaded. Please refresh the page and try again.');

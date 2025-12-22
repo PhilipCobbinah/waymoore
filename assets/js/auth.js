@@ -53,6 +53,31 @@ const AuthManager = {
 
             this.signup(name, email, phone, password);
         });
+        
+        // Setup password visibility toggles
+        this.setupPasswordToggles();
+    },
+
+    setupPasswordToggles() {
+        const passwordToggles = document.querySelectorAll('.password-toggle-btn');
+        passwordToggles.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const inputId = btn.id.replace('-toggle', '');
+                const inputField = document.getElementById(inputId);
+                const icon = btn.querySelector('i');
+                
+                if (inputField.type === 'password') {
+                    inputField.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    inputField.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        });
     },
 
     login(email, password) {
