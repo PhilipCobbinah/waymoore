@@ -128,7 +128,7 @@ header {
             font-size: 1.2rem;
             padding: 18px 32px;
             border-bottom: 1px solid rgba(255,255,255,0.12);
-            color: #1f2937; /* dark, readable on white */
+            color: white;
         }
         .nav-links a:hover,
         .nav-links a:focus {
