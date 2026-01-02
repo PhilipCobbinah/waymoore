@@ -106,7 +106,7 @@ header {
             position: fixed;
             top: 0;
             right: -100%;
-            width: 70%;
+            width: 75%; /* Slightly wider for better mobile touch targets */
             max-width: 320px;
             height: 100vh;
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
@@ -117,42 +117,42 @@ header {
             box-shadow: -5px 0 20px rgba(0,0,0,0.15);
             transition: right 0.3s cubic-bezier(0.4,0,0.2,1);
             z-index: 1100;
+            display: flex !important; /* Force flex even when off-screen */
         }
         .nav-links.active {
             right: 0;
-            display: flex;
         }
         .nav-links a {
             width: 100%;
             text-align: left;
-            font-size: 1.2rem;
-            padding: 18px 32px;
+            font-size: 1.1rem;
+            padding: 16px 24px;
             border-bottom: 1px solid rgba(255,255,255,0.12);
             color: white;
+            display: flex;
+            align-items: center;
         }
         .nav-links a:hover,
         .nav-links a:focus {
-            background: rgba(16,185,129,0.06);
-            color: #10b981;
+            background: rgba(255,255,255,0.1);
+            color: white;
             outline: none;
         }
+        
+        /* Ensure icons in nav links are visible and spaced */
+        .nav-links a i {
+            width: 24px;
+            text-align: center;
+            margin-right: 10px;
+        }
+
         .hamburger {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            z-index: 1200; /* Ensure hamburger is above the slide-out menu */
         }
-    }
-
-    /* ===== OVERRIDE: Hide legacy nav divs (deprecated), but keep modern .nav-links visible ===== */
-    /* Hide only legacy nav > div that are not the .nav-links element */
-    nav > div:not(.nav-links) {
-        display: none !important;
-    }
-
-    /* Ensure the modern navigation container stays visible and uses expected display */
-    nav > div.nav-links {
-        display: flex !important;
     }
 
     /* ===== OVERRIDE: Hide old mobile menu toggle ===== */
@@ -414,108 +414,67 @@ nav a:hover {
 /* Categories Section */
 .categories-section {
     max-width: 1200px;
-    margin: 4rem auto;
-    padding: 2rem 20px;
+    margin: 3rem auto;
+    padding: 20px;
 }
 
 .categories-section h2 {
     text-align: center;
-    color: #1f2937;
-    font-size: 2.2rem;
-    margin-bottom: 0.5rem;
-    font-weight: 700;
-}
-
-.categories-section > p {
-    text-align: center;
-    color: #6b7280;
-    font-size: 1.1rem;
-    margin-bottom: 3rem;
+    color: #10b981;
+    font-size: 2rem;
+    margin-bottom: 2rem;
 }
 
 .categories-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 30px;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
     padding: 0;
 }
 
 .category-card {
     background: white;
-    border-radius: 15px;
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
     position: relative;
-    border: 2px solid transparent;
-}
-
-.category-card::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(5, 150, 105, 0.05));
-    opacity: 0;
-    transition: opacity 0.4s ease;
 }
 
 .category-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 35px rgba(16, 185, 129, 0.2);
-    border-color: #10b981;
-}
-
-.category-card:hover::after {
-    opacity: 1;
+    transform: scale(1.05);
+    box-shadow: 0 12px 30px rgba(16, 185, 129, 0.25);
+    z-index: 10;
 }
 
 .category-card img {
     width: 100%;
-    height: 240px;
+    height: 200px;
     object-fit: cover;
     display: block;
-    transition: transform 0.5s ease;
+    transition: all 0.4s ease;
 }
 
 .category-card:hover img {
-    transform: scale(1.08);
+    transform: scale(1.05);
+    filter: brightness(1.1);
 }
 
 .category-card h3 {
-    padding: 1.5rem;
+    padding: 15px;
     text-align: center;
     color: #1f2937;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 600;
     margin: 0;
     background: white;
-    position: relative;
-    z-index: 1;
     transition: all 0.3s ease;
 }
 
 .category-card:hover h3 {
     color: #10b981;
-}
-
-.category-card h3::before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 3px;
-    background: linear-gradient(90deg, #10b981, #059669);
-    transition: width 0.4s ease;
-}
-
-.category-card:hover h3::before {
-    width: 80%;
+    font-size: 1.15rem;
 }
 
 /* About Page Styles */
@@ -523,44 +482,31 @@ nav a:hover {
     max-width: 100%;
     padding: 2rem 0;
     background: #f9fafb;
-    /* =====================
-       ABOUT PAGE: force left-aligned content
-       This override removes left-side container padding so
-       `.about-content` starts close to the page edge.
-       ===================== */
-    .about {
-        padding-left: 0; /* ensure the outer about area has no left offset */
+}
+
+.about .about-container {
+    padding-left: 0 !important;
+    padding-right: 2rem !important;
+    margin-left: 0 !important;
+    box-sizing: border-box;
+}
+
+.about .about-content {
+    padding-left: 0.75rem !important;
+    margin-left: 0 !important;
+    text-align: left !important;
+    width: 100%;
+}
+
+@media (max-width: 968px) {
+    .about .about-container {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
     }
 
-    .about-container {
-        /* remove left padding that pushes content toward center */
-        padding-left: 0 !important;
-        /* keep some right-side spacing for visual breathing room */
-        padding-right: 2rem !important;
-        margin-left: 0 !important;
-        box-sizing: border-box;
+    .about .about-content {
+        padding-left: 0.5rem !important;
     }
-
-    .about-content {
-        /* small inner gutter so text doesn't sit flush against the page edge */
-        padding-left: 0.75rem !important;
-        margin-left: 0 !important;
-        text-align: left !important;
-        width: 100%;
-    }
-
-    /* mobile: keep symmetric padding so text doesn't hit the viewport edge */
-    @media (max-width: 968px) {
-        .about-container {
-            padding-left: 1rem !important;
-            padding-right: 1rem !important;
-        }
-
-        .about-content {
-            padding-left: 0.5rem !important;
-        }
-    }
-
 }
 
 .about-container {
@@ -860,7 +806,6 @@ nav a:hover {
     transition: all 0.3s ease;
     font-weight: 600;
     box-shadow: 0 3px 8px rgba(16, 185, 129, 0.3);
-    font-size: 0.95rem;
 }
 
 .product-card button:hover,
@@ -1822,186 +1767,6 @@ footer p {
         font-weight: 700;
         font-size: 0.95rem;
     }
-
-    /* Categories Section */
-    .categories-section {
-        max-width: 1200px;
-        margin: 3rem auto;
-        padding: 20px;
-    }
-
-    .categories-section h2 {
-        text-align: center;
-        color: #10b981;
-        font-size: 2rem;
-        margin-bottom: 2rem;
-    }
-
-    .categories-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 20px;
-        padding: 0;
-    }
-
-    .category-card {
-        background: white;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        cursor: pointer;
-        position: relative;
-    }
-
-    .category-card:hover {
-        transform: scale(1.08);
-        box-shadow: 0 12px 30px rgba(16, 185, 129, 0.25);
-        z-index: 10;
-    }
-
-    .category-card img {
-        width: 100%;
-        height: 200px;
-        object-fit: cover;
-        display: block;
-        transition: all 0.4s ease;
-    }
-
-    .category-card:hover img {
-        transform: scale(1.05);
-        filter: brightness(1.1);
-    }
-
-    .category-card h3 {
-        padding: 15px;
-        text-align: center;
-        color: #1f2937;
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin: 0;
-        background: white;
-        transition: all 0.3s ease;
-    }
-
-    .category-card:hover h3 {
-        color: #10b981;
-        font-size: 1.15rem;
-    }
-
-    @media (max-width: 968px) {
-	nav {
-		padding: 12px 16px;
-	}
-	/* ...existing code... */
-
-	/* ensure active state also forces the panel visible (useful for narrow devices) */
-	.nav-links.active {
-		right: 0;
-		display: flex;
-	}
 }
 
 /* ...existing code... */
-
-@media (max-width: 768px) {
-	nav {
-		position: relative;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 1rem;
-	}
-	
-	/* show hamburger on mobile */
-	.hamburger{
-		display: flex;
-		flex-direction: column; /* force vertical stack */
-		align-items: center;
-		justify-content: center;
-	}
-
-	/* make mobile menu a white dropdown and ensure links are readable */
-	.nav-links {
-		position: absolute;
-		top: 100%;
-		left: 0;
-		right: 0;
-		background: #fff;
-		flex-direction: column;
-		gap: 0;
-		display: none; /* hidden until toggled */
-		padding: 0.5rem 1rem;
-		box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-		z-index: 200;
-	}
-
-	/* visible state — ensure both display and (if present) right-positioning are applied */
-	.nav-links.active {
-		display: flex;
-		right: 0;
-	}
-
-	/* override desktop white link color so links show on white background */
-	.nav-links a {
-		padding: 0.75rem 0.5rem;
-		border-bottom: 1px solid rgba(0,0,0,0.06);
-		width: 100%;
-		display: block;
-		color: #1f2937; /* dark, readable on white */
-	}
-
-	.nav-links a:last-child{
-		border-bottom: none;
-	}
-
-	/* mobile hover / focus states */
-	.nav-links a:hover,
-	.nav-links a:focus {
-		background: rgba(16,185,129,0.06);
-		color: #10b981;
-		outline: none;
-	}
-
-	/* icons inside mobile links follow the link color */
-	.nav-links a i {
-		color: inherit;
-	}
-
-	/* ensure the cart/user icons are aligned */
-	.cart-link, .user-link {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-	}
-}
-
-/* About page left spacing fix (small screens) */
-.about-container {
-	max-width: 1200px;
-	margin: 0 auto;
-	padding: 0 1rem;
-	display: grid;
-	grid-template-columns: 1fr 360px;
-	gap: 2rem;
-}
-
-.about-content {
-	text-align: left;
-	margin: 0;
-	padding: 0;
-}
-
-@media (max-width: 768px) {
-	.about-container {
-		grid-template-columns: 1fr;
-		padding-left: 0.75rem;
-		padding-right: 0.75rem;
-	}
-	.about-showcase {
-		order: 2;
-	}
-	.about-content {
-		order: 1;
-	}
-}

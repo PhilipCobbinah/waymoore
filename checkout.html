@@ -184,5 +184,47 @@
     <script src="assets/js/cart.js"></script>
     <script src="assets/js/checkout.js"></script>
     <script src="assets/js/app.js"></script>
+
+    <script>
+        // Fix for mobile navigation toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburger = document.getElementById('hamburger');
+            const navLinks = document.getElementById('navLinks');
+
+            if (hamburger && navLinks) {
+                hamburger.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    navLinks.classList.toggle('active');
+                    hamburger.classList.toggle('active');
+                    
+                    const isExpanded = navLinks.classList.contains('active');
+                    hamburger.setAttribute('aria-expanded', isExpanded);
+                });
+
+                // Close menu when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (navLinks.classList.contains('active') && 
+                        !navLinks.contains(e.target) && 
+                        !hamburger.contains(e.target)) {
+                        navLinks.classList.remove('active');
+                        hamburger.classList.remove('active');
+                        hamburger.setAttribute('aria-expanded', 'false');
+                    }
+                });
+
+                // Close menu when clicking a link
+                const links = navLinks.querySelectorAll('a');
+                links.forEach(link => {
+                    link.addEventListener('click', () => {
+                        navLinks.classList.remove('active');
+                        hamburger.classList.remove('active');
+                        hamburger.setAttribute('aria-expanded', 'false');
+                    });
+                });
+            }
+        });
+    </script>
 </body>
 </html>
