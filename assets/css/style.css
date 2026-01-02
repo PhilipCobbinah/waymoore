@@ -12,6 +12,34 @@ body {
     color: #333;
 }
 
+/* Skip Link - Hidden until focused for accessibility */
+.skip-link {
+    position: absolute;
+    top: -100px;
+    left: 0;
+    background: #10b981;
+    color: white;
+    padding: 10px 20px;
+    z-index: 10000;
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: 0 0 5px 0;
+    transition: top 0.3s ease;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
+/* Noscript notice */
+.noscript {
+    background: #fef3c7;
+    color: #92400e;
+    padding: 1rem;
+    text-align: center;
+    font-weight: 500;
+}
+
 /* Navbar */
 header {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
