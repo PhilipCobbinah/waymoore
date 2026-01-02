@@ -44,9 +44,10 @@ body {
 header {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-    position: relative;
-    overflow: hidden;
-    z-index: 1000;
+    position: sticky;
+    top: 0;
+    overflow: visible; /* Changed from hidden to allow menu to show */
+    z-index: 9999; /* Increased significantly */
 }
 
     /* =====================
@@ -59,7 +60,7 @@ header {
         background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         padding: 16px 32px;
         position: relative;
-        z-index: 100;
+        z-index: 9999;
     }
 
     .nav-links {
@@ -126,6 +127,25 @@ header {
         transform: rotate(-45deg) translate(7px, -7px);
     }
 
+    /* Mobile menu overlay */
+    .nav-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 99998; /* Just below nav-links */
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .nav-overlay.active {
+        display: block;
+        opacity: 1;
+    }
+
     @media (max-width: 968px) {
         nav {
             padding: 12px 16px;
@@ -134,7 +154,7 @@ header {
             position: fixed;
             top: 0;
             right: -100%;
-            width: 75%; /* Slightly wider for better mobile touch targets */
+            width: 75%;
             max-width: 320px;
             height: 100vh;
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
@@ -144,8 +164,9 @@ header {
             padding: 80px 0 2rem 0;
             box-shadow: -5px 0 20px rgba(0,0,0,0.15);
             transition: right 0.3s cubic-bezier(0.4,0,0.2,1);
-            z-index: 1100;
-            display: flex !important; /* Force flex even when off-screen */
+            z-index: 99999; /* Very high z-index to appear above everything */
+            display: flex !important;
+            overflow-y: auto; /* Allow scrolling if menu is tall */
         }
         .nav-links.active {
             right: 0;
@@ -179,7 +200,7 @@ header {
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 1200; /* Ensure hamburger is above the slide-out menu */
+            z-index: 999999; /* Highest z-index for hamburger button */
         }
     }
 
@@ -294,6 +315,7 @@ nav a:hover {
     color: white;
     overflow: hidden;
     position: relative;
+    z-index: 1; /* Ensure hero is below navigation */
 }
 
 .hero-text-slider {
@@ -871,7 +893,7 @@ nav a:hover {
     height: 100%;
     background: rgba(0, 0, 0, 0.8);
     padding-top: 50px;
-    z-index: 1000;
+    z-index: 50000; /* Below nav but above content */
     overflow: auto;
     animation: fadeIn 0.3s ease;
 }
@@ -1696,105 +1718,105 @@ footer p {
 
 .summary-item-info i {
     font-size: 1.8rem;
-}
-
-.summary-item-info div {
+}x;
+   margin-bottom: 1rem;
+.summary-item-info div {    max-height: 400px;
     flex: 1;
 }
 
 .summary-item-info strong {
     font-size: 1.2rem;
     color: #10b981;
+} 1rem;
+olid #10b981;
+.summary-item-info small {om: 0.5rem;
+    color: #6b7280;   display: flex;
+    font-weight: 500;    align-items: center;
 }
 
-.summary-item-info small {
-    color: #6b7280;
-    font-weight: 500;
-}
-
-.summary-products {
-    background: #f9fafb;
-    padding: 1rem;
     border-radius: 8px;
     margin-bottom: 1rem;
     max-height: 400px;
     overflow-y: auto;
-}
-
+}summary-product-item:last-child {
+        border-bottom: none;
 .summary-products h3 {
     font-size: 1rem;
     color: #10b981;
-    margin-bottom: 1rem;
+    margin-bottom: 1rem;ader {
     border-bottom: 2px solid #10b981;
-    padding-bottom: 0.5rem;
-    display: flex;
+    padding-bottom: 0.5rem;   align-items: flex-start;
+    display: flex;        gap: 0.5rem;
     align-items: center;
     gap: 0.5rem;
 }
-
-.summary-product-item {
+-item .item-num {
+.summary-product-item {10b981;
     padding: 0.8rem;
 
     .summary-product-item:last-child {
         border-bottom: none;
-        margin-bottom: 0;
-    }
-
-    .summary-item-header {
-        display: flex;
+        margin-bottom: 0;lex;
+    };
+: center;
+    .summary-item-header {   font-weight: 700;
+        display: flex;        font-size: 0.85rem;
         align-items: flex-start;
         gap: 0.5rem;
         margin-bottom: 0.5rem;
-    }
+    }duct-item .item-name {
 
-    .summary-product-item .item-num {
-        background: #10b981;
+    .summary-product-item .item-num {   font-weight: 600;
+        background: #10b981;        flex: 1;
         color: white;
         width: 24px;
         height: 24px;
         border-radius: 50%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 0.85rem;
+        display: inline-flex;x;
+        align-items: center;ace-between;
+        justify-content: center;;
+        font-weight: 700;   gap: 0.5rem;
+        font-size: 0.85rem;        padding-left: 32px;
         flex-shrink: 0;
     }
 
-    .summary-product-item .item-name {
-        color: #1f2937;
+    .summary-product-item .item-name {summary-product-item .item-unit-price {
+        color: #1f2937;        color: #6b7280;
         font-weight: 600;
         flex: 1;
         line-height: 1.4;
-    }
+    }tem-qty {
 
     .summary-item-details {
-        display: flex;
-        justify-content: space-between;
+        display: flex;   background: #f0fdf4;
+        justify-content: space-between;        padding: 0.2rem 0.5rem;
         align-items: center;
         gap: 0.5rem;
         padding-left: 32px;
-        font-size: 0.85rem;
-    }
-
-    .summary-product-item .item-unit-price {
+        font-size: 0.85rem;item-price {
+    }   color: #10b981;
+       font-weight: 700;
+    .summary-product-item .item-unit-price {        font-size: 0.95rem;
         color: #6b7280;
-        font-size: 0.8rem;
-    }
 
-    .summary-product-item .item-qty {
-        color: #059669;
-        font-weight: 700;
-        background: #f0fdf4;
-        padding: 0.2rem 0.5rem;
-        border-radius: 4px;
-    }
 
-    .summary-product-item .item-price {
-        color: #10b981;
-        font-weight: 700;
-        font-size: 0.95rem;
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ...existing code... */}    }        font-size: 0.95rem;        font-weight: 700;        color: #10b981;    .summary-product-item .item-price {    }        border-radius: 4px;        padding: 0.2rem 0.5rem;        background: #f0fdf4;        font-weight: 700;        color: #059669;    .summary-product-item .item-qty {    }        font-size: 0.8rem;}
 
 /* ...existing code... */
