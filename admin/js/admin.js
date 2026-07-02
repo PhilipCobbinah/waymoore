@@ -479,7 +479,22 @@ const storefrontSeedProducts = [
 
 function normalizeProductRecord(product, fallbackId = Date.now()) {
     const image = product.image || product.thumbnail || (Array.isArray(product.images) ? product.images[0] : '') || '/assets/img/products/waymoore_logo.jpg';
-    const normalizedImage = String(image).replace(/^\.\//, '').replace(/^\.\.\//, '').replace(/^\//, '/');
+    const isDataUrl = String(image).startsWith('data:') || String(image).startsWith('blob:');
+    const normalizedImage = isDataUrl ? String(image) : String(image).replace(/^\.\//, '').replace(/^\.\.\//, '').replace(/^\//, '/');
+    
+    // Process images array, preserving data URLs
+    let processedImages = [];
+    if (Array.isArray(product.images) && product.images.length) {
+        processedImages = product.images.map((imagePath) => {
+            const isDataImg = String(imagePath).startsWith('data:') || String(imagePath).startsWith('blob:');
+            if (isDataImg) return String(imagePath);
+            const cleaned = String(imagePath).replace(/^\.\//, '').replace(/^\.\.\//, '').replace(/^\//, '/');
+            return cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
+        });
+    } else {
+        processedImages = [isDataUrl ? normalizedImage : (normalizedImage.startsWith('/') ? normalizedImage : `/${normalizedImage}`)];
+    }
+    
     return {
         ...product,
         id: Number(product.id || fallbackId),
@@ -503,8 +518,8 @@ function normalizeProductRecord(product, fallbackId = Date.now()) {
         bestseller: Boolean(product.bestseller),
         newArrival: Boolean(product.newArrival),
         trending: Boolean(product.trending),
-        thumbnail: normalizedImage.startsWith('/') ? normalizedImage : `/${normalizedImage}`,
-        images: Array.isArray(product.images) && product.images.length ? product.images.map((imagePath) => String(imagePath).replace(/^\.\//, '').replace(/^\.\.\//, '').replace(/^\//, '/')).map((imagePath) => imagePath.startsWith('/') ? imagePath : `/${imagePath}`) : [normalizedImage.startsWith('/') ? normalizedImage : `/${normalizedImage}`],
+        thumbnail: isDataUrl ? normalizedImage : (normalizedImage.startsWith('/') ? normalizedImage : `/${normalizedImage}`),
+        images: processedImages,
         videoUrl: product.videoUrl || '',
         seoTitle: product.seoTitle || product.name || 'Product',
         seoDescription: product.seoDescription || product.description || product.shortDescription || '',
@@ -1082,7 +1097,7 @@ function updatePreview() {
     }
 }
 
-function handleAddProductSubmit(event) {
+async function handleAddProductSubmit(event) {
     event.preventDefault();
     const form = event.currentTarget;
     const submitter = event.submitter;
@@ -1120,6 +1135,23 @@ function handleAddProductSubmit(event) {
     const seoDescription = form.querySelector('#product-seo-description')?.value || shortDescription;
     const slug = form.querySelector('#product-slug')?.value || name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
+    // Handle image uploads
+    let thumbnail = 'assets/img/products/waymoore_logo.jpg';
+    let images = [];
+    const imageFiles = Array.from(form.querySelector('#product-images')?.files || []);
+    
+    try {
+        if (imageFiles.length > 0) {
+            // Convert all image files to data URLs
+            const imageDataUrls = await Promise.all(imageFiles.map((file) => readFileAsDataURL(file)));
+            images = imageDataUrls;
+            thumbnail = imageDataUrls[0]; // Use first image as thumbnail
+        }
+    } catch (error) {
+        console.error('Error processing images:', error);
+        showToast('Error processing images. Proceeding without images.', 'error');
+    }
+
     const productPayload = {
         id: Date.now(),
         name,
@@ -1142,8 +1174,8 @@ function handleAddProductSubmit(event) {
         bestseller,
         newArrival,
         trending,
-        thumbnail: '../assets/img/products/waymoore_logo.jpg',
-        images: ['../assets/img/products/waymoore_logo.jpg'],
+        thumbnail,
+        images,
         videoUrl,
         seoTitle,
         seoDescription,
