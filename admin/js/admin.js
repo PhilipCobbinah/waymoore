@@ -7,7 +7,8 @@ const STORAGE_KEYS = {
     messages: 'waymooreAdminMessages',
     reviews: 'waymooreAdminReviews',
     settings: 'waymooreAdminSettings',
-    currency: 'waymooreAdminCurrency'
+    currency: 'waymooreAdminCurrency',
+    media: 'waymooreMediaLibrary'
 };
 
 // Currency configuration with African currencies and USD exchange rates
@@ -93,6 +94,57 @@ function updatePriceDisplay(element, rawPrice, sourceCurrency = 'NGN') {
     const formatted = formatPrice(convertedAmount, targetCurrency);
     element.textContent = formatted;
 }
+
+// Media Library Management
+const MediaLibrary = {
+    getAll() {
+        const data = localStorage.getItem(STORAGE_KEYS.media);
+        return data ? JSON.parse(data) : {};
+    },
+
+    save(library) {
+        localStorage.setItem(STORAGE_KEYS.media, JSON.stringify(library));
+        window.dispatchEvent(new CustomEvent('mediaLibraryUpdated', { detail: { library } }));
+    },
+
+    addMedia(file, dataUrl) {
+        const library = this.getAll();
+        const mediaId = `media-${Date.now()}`;
+        library[mediaId] = {
+            id: mediaId,
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            data: dataUrl,
+            path: `admin/media/${mediaId}.jpg`,
+            uploadedAt: new Date().toISOString()
+        };
+        this.save(library);
+        return mediaId;
+    },
+
+    getMedia(mediaId) {
+        const library = this.getAll();
+        return library[mediaId] || null;
+    },
+
+    getMediaUrl(mediaId) {
+        const media = this.getMedia(mediaId);
+        return media ? media.data : null;
+    },
+
+    deleteMedia(mediaId) {
+        const library = this.getAll();
+        delete library[mediaId];
+        this.save(library);
+        return true;
+    },
+
+    getMediaList() {
+        const library = this.getAll();
+        return Object.values(library).sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
+    }
+};
 
 const defaultProducts = [
     {
@@ -1155,12 +1207,20 @@ async function handleAddProductSubmit(event) {
     // Handle image uploads
     let thumbnail = 'assets/img/products/waymoore_logo.jpg';
     let images = [];
+    let mediaIds = [];
     const imageFiles = Array.from(form.querySelector('#product-images')?.files || []);
     
     try {
         if (imageFiles.length > 0) {
-            // Convert all image files to data URLs
+            // Convert all image files to data URLs and save to media library
             const imageDataUrls = await Promise.all(imageFiles.map((file) => readFileAsDataURL(file)));
+            
+            // Add each image to media library and collect IDs
+            mediaIds = imageDataUrls.map((dataUrl, index) => {
+                return MediaLibrary.addMedia(imageFiles[index], dataUrl);
+            });
+            
+            // For backward compatibility, also keep data URLs
             images = imageDataUrls;
             thumbnail = imageDataUrls[0]; // Use first image as thumbnail
         }
@@ -1193,6 +1253,7 @@ async function handleAddProductSubmit(event) {
         trending,
         thumbnail,
         images,
+        mediaIds,
         videoUrl,
         seoTitle,
         seoDescription,

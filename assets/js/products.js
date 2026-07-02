@@ -182,8 +182,33 @@ function resolveStorefrontAssetPath(imagePath) {
     return cleaned.startsWith('assets/') ? cleaned : `assets/${cleaned}`;
 }
 
+function resolveMediaUrl(image) {
+    // If image is already a data URL, return it
+    if (typeof image === 'string' && image.startsWith('data:')) {
+        return image;
+    }
+    
+    // If image is a media ID reference, try to load from media library
+    if (typeof image === 'string' && image.startsWith('media-')) {
+        try {
+            const mediaLibrary = JSON.parse(localStorage.getItem('waymooreMediaLibrary') || '{}');
+            if (mediaLibrary[image] && mediaLibrary[image].data) {
+                return mediaLibrary[image].data;
+            }
+        } catch (e) {
+            console.warn('Could not resolve media URL:', image);
+        }
+    }
+    
+    return image;
+}
+
 function normalizeStorefrontProduct(product) {
-    const image = product.image || product.thumbnail || (Array.isArray(product.images) ? product.images[0] : '') || 'assets/img/products/waymoore_logo.jpg';
+    let image = product.image || product.thumbnail || (Array.isArray(product.images) ? product.images[0] : '') || 'assets/img/products/waymoore_logo.jpg';
+    
+    // Resolve media library references
+    image = resolveMediaUrl(image);
+    
     const normalizedImage = String(image).replace(/^\.\//, '').replace(/^\.\.\//, '');
     return {
         ...product,
