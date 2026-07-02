@@ -6,8 +6,78 @@ const STORAGE_KEYS = {
     customers: 'waymooreAdminCustomers',
     messages: 'waymooreAdminMessages',
     reviews: 'waymooreAdminReviews',
-    settings: 'waymooreAdminSettings'
+    settings: 'waymooreAdminSettings',
+    currency: 'waymooreAdminCurrency'
 };
+
+// Currency configuration with African currencies and USD exchange rates
+const CURRENCIES = {
+    NGN: { name: 'Nigerian Naira', symbol: '₦', rate: 1550 },
+    GHS: { name: 'Ghanaian Cedi', symbol: '₵', rate: 12.5 },
+    USD: { name: 'US Dollar', symbol: '$', rate: 1 },
+    KES: { name: 'Kenyan Shilling', symbol: 'KSh', rate: 147 },
+    ZAR: { name: 'South African Rand', symbol: 'R', rate: 18.5 },
+    EGP: { name: 'Egyptian Pound', symbol: 'E£', rate: 48 },
+    UGX: { name: 'Ugandan Shilling', symbol: 'USh', rate: 3800 },
+    TZS: { name: 'Tanzanian Shilling', symbol: 'TSh', rate: 2650 },
+    RWF: { name: 'Rwandan Franc', symbol: 'Fr', rate: 1310 },
+    XOF: { name: 'West African CFA Franc', symbol: 'Fr', rate: 615 }
+};
+
+// Currency Management Functions
+function getCurrentCurrency() {
+    return localStorage.getItem(STORAGE_KEYS.currency) || 'NGN';
+}
+
+function setCurrentCurrency(currency) {
+    if (CURRENCIES[currency]) {
+        localStorage.setItem(STORAGE_KEYS.currency, currency);
+        window.dispatchEvent(new CustomEvent('currencyChanged', { detail: { currency } }));
+        return true;
+    }
+    return false;
+}
+
+function convertPrice(price, fromCurrency = 'NGN', toCurrency = 'NGN') {
+    if (!price) return '0';
+    
+    // Extract numeric value from price string
+    const numericValue = parseFloat(String(price).replace(/[^\d.]/g, ''));
+    if (isNaN(numericValue)) return '0';
+    
+    const fromRate = CURRENCIES[fromCurrency]?.rate || 1;
+    const toRate = CURRENCIES[toCurrency]?.rate || 1;
+    
+    // Convert to USD first, then to target currency
+    const usdValue = numericValue / fromRate;
+    const convertedValue = usdValue * toRate;
+    
+    return convertedValue.toFixed(2);
+}
+
+function formatPrice(amount, currency = 'NGN') {
+    const currencyInfo = CURRENCIES[currency];
+    if (!currencyInfo) return amount;
+    
+    const numericValue = parseFloat(amount);
+    if (isNaN(numericValue)) return amount;
+    
+    const isLargeNumber = numericValue >= 1000;
+    const formatted = isLargeNumber 
+        ? numericValue.toLocaleString('en-US', { maximumFractionDigits: 0 })
+        : numericValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    
+    return `${currencyInfo.symbol}${formatted}`;
+}
+
+function updatePriceDisplay(element, rawPrice, sourceCurrency = 'NGN') {
+    if (!element || !rawPrice) return;
+    
+    const targetCurrency = getCurrentCurrency();
+    const convertedAmount = convertPrice(rawPrice, sourceCurrency, targetCurrency);
+    const formatted = formatPrice(convertedAmount, targetCurrency);
+    element.textContent = formatted;
+}
 
 const defaultProducts = [
     {
@@ -1020,8 +1090,20 @@ function handleAddProductSubmit(event) {
     const name = form.querySelector('#product-name')?.value?.trim() || 'New Product';
     const category = form.querySelector('#product-category')?.value || 'Uncategorized';
     const subcategory = form.querySelector('#product-subcategory')?.value || '';
-    const price = form.querySelector('#product-price')?.value || '₵0';
-    const discountPrice = form.querySelector('#product-discount')?.value || '';
+    const currentCurrency = getCurrentCurrency();
+    
+    // Get raw price values from inputs
+    const priceInput = form.querySelector('#product-price')?.value || '0';
+    const discountPriceInput = form.querySelector('#product-discount')?.value || '';
+    
+    // Convert prices to Naira for consistent storage (reference currency)
+    const priceInNaira = convertPrice(priceInput, currentCurrency, 'NGN');
+    const discountPriceInNaira = discountPriceInput ? convertPrice(discountPriceInput, currentCurrency, 'NGN') : '';
+    
+    // Format prices with currency symbols for display
+    const price = formatPrice(priceInNaira, 'NGN');
+    const discountPrice = discountPriceInNaira ? formatPrice(discountPriceInNaira, 'NGN') : '';
+    
     const sku = form.querySelector('#product-sku')?.value || `WP-${Date.now()}`;
     const quantity = Number(form.querySelector('#product-quantity')?.value || 0);
     const weight = form.querySelector('#product-weight')?.value || '';
@@ -1067,7 +1149,10 @@ function handleAddProductSubmit(event) {
         seoDescription,
         slug,
         createdAt: new Date().toISOString().slice(0, 10),
-        updatedAt: new Date().toISOString().slice(0, 10)
+        updatedAt: new Date().toISOString().slice(0, 10),
+        // Store currency metadata for price conversion
+        baseCurrency: 'NGN',
+        basePriceInNaira: priceInNaira
     };
 
     products.unshift(productPayload);
@@ -1111,8 +1196,49 @@ function initializeSharedAdminShell() {
     });
 }
 
+function initializeCurrencySelector() {
+    const currencySelect = document.getElementById('currency-select');
+    if (!currencySelect) return;
+    
+    // Set initial value to current currency
+    const currentCurrency = getCurrentCurrency();
+    currencySelect.value = currentCurrency;
+    
+    // Update price displays when currency changes
+    currencySelect.addEventListener('change', (event) => {
+        const newCurrency = event.target.value;
+        setCurrentCurrency(newCurrency);
+        updateAllPriceDisplays(newCurrency);
+    });
+    
+    // Listen for currency changes from other tabs/windows
+    window.addEventListener('currencyChanged', (event) => {
+        currencySelect.value = event.detail.currency;
+        updateAllPriceDisplays(event.detail.currency);
+    });
+}
+
+function updateAllPriceDisplays(currency) {
+    const priceInput = document.getElementById('product-price');
+    const discountInput = document.getElementById('product-discount');
+    const previewPrice = document.getElementById('preview-price');
+    
+    if (priceInput && priceInput.value) {
+        const convertedPrice = convertPrice(priceInput.value, 'NGN', currency);
+        const formatted = formatPrice(convertedPrice, currency);
+        priceInput.value = convertedPrice;
+        if (previewPrice) previewPrice.textContent = formatted;
+    }
+    
+    if (discountInput && discountInput.value) {
+        const convertedDiscount = convertPrice(discountInput.value, 'NGN', currency);
+        discountInput.value = convertedDiscount;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initializeSharedAdminShell();
+    initializeCurrencySelector();
     if (document.getElementById('admin-login-form')) {
         initializeLogin();
     }
