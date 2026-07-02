@@ -664,8 +664,11 @@ function applySidebarState() {
     const isCollapsed = localStorage.getItem(getSidebarStateKey()) === 'true';
     sidebar.classList.toggle('collapsed', isCollapsed);
     sidebar.classList.remove('open');
+    sidebar.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('sidebar-open');
     if (toggle) {
         toggle.classList.toggle('is-open', isCollapsed);
+        toggle.setAttribute('aria-expanded', String(isCollapsed));
     }
     if (overlay) {
         overlay.classList.remove('active');
@@ -689,8 +692,14 @@ function toggleSidebar(force) {
 
     const shouldOpen = typeof force === 'boolean' ? force : !sidebar.classList.contains('open');
     sidebar.classList.toggle('open', shouldOpen);
+    sidebar.classList.toggle('collapsed', false);
+    sidebar.setAttribute('aria-hidden', String(!shouldOpen));
     if (overlay) overlay.classList.toggle('active', shouldOpen);
-    if (toggle) toggle.classList.toggle('is-open', shouldOpen);
+    if (toggle) {
+        toggle.classList.toggle('is-open', shouldOpen);
+        toggle.setAttribute('aria-expanded', String(shouldOpen));
+    }
+    document.body.classList.toggle('sidebar-open', shouldOpen);
 }
 
 function loadProducts() {
@@ -1209,19 +1218,19 @@ function bindDashboardEvents() {
         }, null, 'Delete all products cancelled');
     });
     document.getElementById('logout-btn')?.addEventListener('click', logout);
-    document.getElementById('sidebar-toggle')?.addEventListener('click', () => toggleSidebar());
-    document.getElementById('sidebar-overlay')?.addEventListener('click', () => toggleSidebar(false));
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') {
             toggleSidebar(false);
         }
     });
+
     window.addEventListener('resize', () => {
         if (window.innerWidth > 768) {
-            toggleSidebar(localStorage.getItem(getSidebarStateKey()) === 'true');
+            applySidebarState();
         } else {
-            document.getElementById('sidebar')?.classList.remove('collapsed');
-            document.getElementById('sidebar-overlay')?.classList.remove('active');
+            document.body.classList.remove('sidebar-open');
+            sidebar?.classList.remove('open');
+            sidebarOverlay?.classList.remove('active');
         }
     });
     document.getElementById('global-search')?.addEventListener('input', (event) => {
@@ -1433,12 +1442,22 @@ function initializeSharedAdminShell() {
             toggleSidebar(false);
         }
     });
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+    document.addEventListener('click', (event) => {
+        if (!sidebar || !sidebar.classList.contains('open')) return;
+        if (window.innerWidth > 768) return;
+        if (sidebarToggle?.contains(event.target) || sidebar.contains(event.target)) return;
+        toggleSidebar(false);
+    });
     window.addEventListener('resize', () => {
         if (window.innerWidth > 768) {
-            toggleSidebar(localStorage.getItem(getSidebarStateKey()) === 'true');
+            applySidebarState();
         } else {
             document.getElementById('sidebar')?.classList.remove('collapsed');
             document.getElementById('sidebar-overlay')?.classList.remove('active');
+            document.getElementById('sidebar')?.classList.remove('open');
+            document.body.classList.remove('sidebar-open');
         }
     });
 }
