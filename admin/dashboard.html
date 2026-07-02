@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - WAYMOORE</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="admin-body">
+    <div class="admin-shell">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar__brand">
+                <img src="../assets/img/products/waymoore_logo.jpg" alt="Waymoore logo">
+                <div>
+                    <p class="eyebrow">WAYMOORE</p>
+                    <h2>Admin CMS</h2>
+                </div>
+            </div>
+
+            <nav class="sidebar__nav">
+                <a href="dashboard.html" class="active"><i class="fas fa-chart-pie"></i><span>Dashboard</span></a>
+                <a href="products/products.html"><i class="fas fa-box"></i><span>Products</span></a>
+                <a href="categories/index.html"><i class="fas fa-tags"></i><span>Categories</span></a>
+                <a href="orders/index.html"><i class="fas fa-receipt"></i><span>Orders</span></a>
+                <a href="customers/index.html"><i class="fas fa-users"></i><span>Customers</span></a>
+                <a href="customers/index.html"><i class="fas fa-user"></i><span>Users</span></a>
+                <a href="reviews/index.html"><i class="fas fa-star"></i><span>Reviews</span></a>
+                <a href="messages/index.html"><i class="fas fa-envelope"></i><span>Messages</span></a>
+                <a href="media/index.html"><i class="fas fa-images"></i><span>Media Library</span></a>
+                <a href="settings/index.html"><i class="fas fa-cog"></i><span>Settings</span></a>
+                <a href="profile/index.html"><i class="fas fa-user"></i><span>Profile</span></a>
+                <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+            </nav>
+        </aside>
+
+        <main class="main-panel">
+            <header class="topbar">
+                <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Toggle sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="topbar__search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="global-search" placeholder="Global search products, orders, customers">
+                </div>
+                <div class="topbar__actions">
+                    <button class="icon-btn" type="button" aria-label="Notifications">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <div class="topbar__profile">
+                        <div class="avatar">A</div>
+                        <div>
+                            <strong>Admin</strong>
+                            <p>Super Admin</p>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <section class="dashboard-content">
+                <div class="page-header">
+                    <div>
+                        <p class="eyebrow">OVERVIEW</p>
+                        <h1>Welcome back, Waymoore Admin</h1>
+                    </div>
+                    <button class="btn btn-primary" id="open-product-modal" type="button">+ Add Product</button>
+                </div>
+
+                <div class="stats-grid">
+                    <article class="stat-card">
+                        <div class="stat-card__icon green"><i class="fas fa-box"></i></div>
+                        <div>
+                            <h3 id="stat-products">0</h3>
+                            <p>Total Products</p>
+                        </div>
+                    </article>
+                    <article class="stat-card">
+                        <div class="stat-card__icon purple"><i class="fas fa-receipt"></i></div>
+                        <div>
+                            <h3 id="stat-orders">24</h3>
+                            <p>Total Orders</p>
+                        </div>
+                    </article>
+                    <article class="stat-card">
+                        <div class="stat-card__icon gold"><i class="fas fa-dollar-sign"></i></div>
+                        <div>
+                            <h3 id="stat-revenue">₵0</h3>
+                            <p>Revenue</p>
+                        </div>
+                    </article>
+                    <article class="stat-card">
+                        <div class="stat-card__icon blue"><i class="fas fa-users"></i></div>
+                        <div>
+                            <h3 id="stat-customers">0</h3>
+                            <p>Customers</p>
+                        </div>
+                    </article>
+                    <article class="stat-card">
+                        <div class="stat-card__icon emerald"><i class="fas fa-exclamation-triangle"></i></div>
+                        <div>
+                            <h3 id="stat-low-stock">0</h3>
+                            <p>Low Stock</p>
+                        </div>
+                    </article>
+                    <article class="stat-card">
+                        <div class="stat-card__icon amber"><i class="fas fa-clock"></i></div>
+                        <div>
+                            <h3 id="stat-pending-orders">0</h3>
+                            <p>Pending Orders</p>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="panel-grid">
+                    <section class="panel panel--wide">
+                        <div class="panel__header">
+                            <div>
+                                <p class="eyebrow">PRODUCT MANAGEMENT</p>
+                                <h2>Products</h2>
+                            </div>
+                            <div class="panel__controls">
+                                <input type="search" id="product-search" placeholder="Search products">
+                                <select id="product-filter">
+                                    <option value="all">All categories</option>
+                                    <option value="Health & Wellness">Health & Wellness</option>
+                                    <option value="Hair Care">Hair Care</option>
+                                    <option value="Skin Care">Skin Care</option>
+                                    <option value="Household">Household</option>
+                                </select>
+                                <select id="product-sort">
+                                    <option value="created-desc">Newest</option>
+                                    <option value="name-asc">Name A-Z</option>
+                                    <option value="price-desc">Price High-Low</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="table-shell">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Image</th>
+                                        <th>Name</th>
+                                        <th>Category</th>
+                                        <th>Price</th>
+                                        <th>Stock</th>
+                                        <th>Status</th>
+                                        <th>Updated</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="product-table-body"></tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <section class="panel">
+                        <div class="panel__header">
+                            <div>
+                                <p class="eyebrow">QUICK ACTIONS</p>
+                                <h2>Operations</h2>
+                            </div>
+                        </div>
+                        <div class="stack-list">
+                            <button class="action-card" type="button" id="bulk-publish-btn"><i class="fas fa-check-circle"></i><span>Bulk Publish</span></button>
+                            <button class="action-card" type="button" id="bulk-hide-btn"><i class="fas fa-eye-slash"></i><span>Bulk Hide</span></button>
+                            <button class="action-card" type="button" id="bulk-delete-btn"><i class="fas fa-trash"></i><span>Bulk Delete</span></button>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="dashboard-grid">
+                    <section class="panel">
+                        <div class="panel__header">
+                            <div>
+                                <p class="eyebrow">SALES SNAPSHOT</p>
+                                <h2>Monthly Sales</h2>
+                            </div>
+                        </div>
+                        <div class="chart-bars" aria-label="Sales chart">
+                            <div class="chart-bar"><span>Jan</span><div class="chart-bar__track"><div class="chart-bar__fill" style="height: 62%"></div></div></div>
+                            <div class="chart-bar"><span>Feb</span><div class="chart-bar__track"><div class="chart-bar__fill" style="height: 78%"></div></div></div>
+                            <div class="chart-bar"><span>Mar</span><div class="chart-bar__track"><div class="chart-bar__fill" style="height: 68%"></div></div></div>
+                            <div class="chart-bar"><span>Apr</span><div class="chart-bar__track"><div class="chart-bar__fill" style="height: 84%"></div></div></div>
+                            <div class="chart-bar"><span>May</span><div class="chart-bar__track"><div class="chart-bar__fill" style="height: 91%"></div></div></div>
+                            <div class="chart-bar"><span>Jun</span><div class="chart-bar__track"><div class="chart-bar__fill" style="height: 97%"></div></div></div>
+                        </div>
+                    </section>
+
+                    <section class="panel">
+                        <div class="panel__header">
+                            <div>
+                                <p class="eyebrow">CATEGORY MIX</p>
+                                <h2>Best Performing Categories</h2>
+                            </div>
+                        </div>
+                        <div class="progress-list">
+                            <div class="progress-item"><div class="progress-item__meta"><strong>Body Care</strong><span>92%</span></div><div class="progress-bar"><span style="width: 92%"></span></div></div>
+                            <div class="progress-item"><div class="progress-item__meta"><strong>Hair Care</strong><span>81%</span></div><div class="progress-bar"><span style="width: 81%"></span></div></div>
+                            <div class="progress-item"><div class="progress-item__meta"><strong>Skincare</strong><span>74%</span></div><div class="progress-bar"><span style="width: 74%"></span></div></div>
+                            <div class="progress-item"><div class="progress-item__meta"><strong>Household</strong><span>60%</span></div><div class="progress-bar"><span style="width: 60%"></span></div></div>
+                        </div>
+                    </section>
+
+                    <section class="panel panel--wide">
+                        <div class="panel__header">
+                            <div>
+                                <p class="eyebrow">RECENT ORDERS</p>
+                                <h2>Latest customer activity</h2>
+                            </div>
+                        </div>
+                        <div class="table-shell">
+                            <table>
+                                <thead>
+                                    <tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>#1002</td><td>Abigail T.</td><td>₵360</td><td><span class="badge published">Paid</span></td></tr>
+                                    <tr><td>#1003</td><td>Kwame B.</td><td>₵145</td><td><span class="badge draft">Processing</span></td></tr>
+                                    <tr><td>#1004</td><td>Nadia S.</td><td>₵220</td><td><span class="badge hidden">Pending</span></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <section class="panel">
+                        <div class="panel__header">
+                            <div>
+                                <p class="eyebrow">RECENT ACTIVITY</p>
+                                <h2>Live feed</h2>
+                            </div>
+                        </div>
+                        <div class="stack-list">
+                            <div class="activity-item"><strong>New review received</strong><p>Body butter feedback marked as featured.</p></div>
+                            <div class="activity-item"><strong>Inventory alert</strong><p>Hair growth butter is below safe stock.</p></div>
+                            <div class="activity-item"><strong>Product published</strong><p>Repair black soap is now live on the storefront.</p></div>
+                        </div>
+                    </section>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <div class="modal hidden" id="product-modal" aria-hidden="true">
+        <div class="modal__content">
+            <div class="modal__header">
+                <div>
+                    <p class="eyebrow">PRODUCT FORM</p>
+                    <h2 id="modal-title">Add Product</h2>
+                </div>
+                <button class="icon-btn" id="close-modal" type="button" aria-label="Close modal"><i class="fas fa-times"></i></button>
+            </div>
+
+            <form id="product-form" class="admin-form">
+                <input type="hidden" id="product-id" name="id">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="product-name">Product Name</label>
+                        <input type="text" id="product-name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-category">Category</label>
+                        <input type="text" id="product-category" name="category" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-subcategory">Subcategory</label>
+                        <input type="text" id="product-subcategory" name="subcategory">
+                    </div>
+                    <div class="form-group">
+                        <label for="product-price">Price</label>
+                        <input type="text" id="product-price" name="price" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-discount">Discount Price</label>
+                        <input type="text" id="product-discount" name="discountPrice">
+                    </div>
+                    <div class="form-group">
+                        <label for="product-sku">SKU</label>
+                        <input type="text" id="product-sku" name="sku">
+                    </div>
+                    <div class="form-group">
+                        <label for="product-quantity">Quantity</label>
+                        <input type="number" id="product-quantity" name="quantity" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="product-weight">Weight</label>
+                        <input type="text" id="product-weight" name="weight">
+                    </div>
+                    <div class="form-group form-group--full">
+                        <label for="product-short-description">Short Description</label>
+                        <textarea id="product-short-description" name="shortDescription" rows="2"></textarea>
+                    </div>
+                    <div class="form-group form-group--full">
+                        <label for="product-description">Product Description</label>
+                        <textarea id="product-description" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="form-group form-group--full">
+                        <label for="product-ingredients">Ingredients</label>
+                        <textarea id="product-ingredients" name="ingredients" rows="2"></textarea>
+                    </div>
+                    <div class="form-group form-group--full">
+                        <label for="product-benefits">Benefits</label>
+                        <textarea id="product-benefits" name="benefits" rows="2"></textarea>
+                    </div>
+                    <div class="form-group form-group--full">
+                        <label for="product-directions">Directions</label>
+                        <textarea id="product-directions" name="directions" rows="2"></textarea>
+                    </div>
+                    <div class="form-group form-group--full">
+                        <label for="product-warnings">Warnings</label>
+                        <textarea id="product-warnings" name="warnings" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-tags">Tags</label>
+                        <input type="text" id="product-tags" name="tags" placeholder="natural, botanical, wellness">
+                    </div>
+                    <div class="form-group">
+                        <label for="product-status">Status</label>
+                        <select id="product-status" name="status">
+                            <option value="Published">Published</option>
+                            <option value="Draft">Draft</option>
+                            <option value="Hidden">Hidden</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-slug">Slug</label>
+                        <input type="text" id="product-slug" name="slug">
+                    </div>
+                    <div class="form-group">
+                        <label for="product-seo-title">SEO Title</label>
+                        <input type="text" id="product-seo-title" name="seoTitle">
+                    </div>
+                    <div class="form-group form-group--full">
+                        <label for="product-seo-description">SEO Description</label>
+                        <textarea id="product-seo-description" name="seoDescription" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-thumbnail">Thumbnail</label>
+                        <input type="file" id="product-thumbnail" name="thumbnail" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label for="product-images">Gallery Images</label>
+                        <input type="file" id="product-images" name="images" accept="image/*" multiple>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-video">Product Video</label>
+                        <input type="text" id="product-video" name="videoUrl" placeholder="https://">
+                    </div>
+                    <div class="form-group form-group--full">
+                        <label for="drop-zone">Gallery Drop Zone</label>
+                        <div id="drop-zone" class="drop-zone">Drop images here or use the file input above.</div>
+                    </div>
+                    <div class="form-group form-group--full">
+                        <label>Quick Flags</label>
+                        <div class="checkbox-grid">
+                            <label class="checkbox-row"><input type="checkbox" id="product-featured" name="featured"><span>Featured</span></label>
+                            <label class="checkbox-row"><input type="checkbox" id="product-bestseller" name="bestseller"><span>Best Seller</span></label>
+                            <label class="checkbox-row"><input type="checkbox" id="product-new-arrival" name="newArrival"><span>New Arrival</span></label>
+                            <label class="checkbox-row"><input type="checkbox" id="product-trending" name="trending"><span>Trending</span></label>
+                        </div>
+                    </div>
+                    <div class="form-group form-group--full">
+                        <label>Gallery Preview</label>
+                        <div id="media-preview-list" class="media-preview-list"></div>
+                    </div>
+                    <div class="form-group form-group--full">
+                        <label>Preview</label>
+                        <article class="product-preview-card" id="live-preview">
+                            <img id="preview-image" src="../assets/img/products/waymoore_logo.jpg" alt="Preview">
+                            <div>
+                                <h3 id="preview-name">Product Name</h3>
+                                <p id="preview-description">Short description will appear here.</p>
+                                <span id="preview-price">₵0</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="modal__footer">
+                    <button class="btn btn-secondary" type="button" id="cancel-product">Cancel</button>
+                    <button class="btn btn-primary" type="submit">Save Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/admin.js"></script>
+</body>
+</html>

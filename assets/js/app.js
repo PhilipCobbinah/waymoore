@@ -6,25 +6,47 @@ document.addEventListener('DOMContentLoaded', function() {
     // ===== HAMBURGER MENU INITIALIZATION =====
     const hamburger = document.getElementById('hamburger');
     const navLinks = document.getElementById('navLinks');
-    
+    const navOverlay = document.getElementById('navOverlay');
+    const nav = document.querySelector('nav');
+
+    if (nav) {
+        const updateNavShadow = () => {
+            nav.classList.toggle('scrolled', window.scrollY > 8);
+        };
+
+        updateNavShadow();
+        window.addEventListener('scroll', updateNavShadow, { passive: true });
+    }
+
     if (hamburger && navLinks) {
         const setMenuState = (open) => {
             navLinks.classList.toggle('active', open);
-            hamburger.classList.toggle('open', open);
+            navLinks.classList.toggle('nav-open', open);
+            if (nav) nav.classList.toggle('nav-open', open);
+            hamburger.classList.toggle('active', open);
             hamburger.setAttribute('aria-expanded', open ? 'true' : 'false');
+            if (navOverlay) navOverlay.classList.toggle('active', open);
+            document.body.style.overflow = open ? 'hidden' : '';
         };
 
-        // Toggle menu on button click (first click shows menu)
+        // Toggle menu on button click
         hamburger.addEventListener('click', function(e) {
             e.stopPropagation();
             setMenuState(!navLinks.classList.contains('active'));
         });
-        
+
         // Close when a link inside nav is clicked
         navLinks.addEventListener('click', function(e) {
             if (e.target.closest('a')) setMenuState(false);
         });
-        
+
+        // Close when clicking on the overlay
+        if (navOverlay) {
+            navOverlay.addEventListener('click', function() {
+                setMenuState(false);
+            });
+        }
+
         // Close when clicking outside nav or on Escape
         document.addEventListener('click', function(e) {
             if (!navLinks.contains(e.target) && !hamburger.contains(e.target)) setMenuState(false);
@@ -32,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') setMenuState(false);
         });
-        
+
         console.log('✓ Hamburger menu initialized');
     } else {
         console.error('❌ Hamburger or navLinks element not found');
@@ -63,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // ===== HIGHLIGHT ACTIVE PAGE =====
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-    document.querySelectorAll('nav a').forEach(link => {
+    document.querySelectorAll('.nav-links a').forEach(link => {
         const href = link.getAttribute('href');
         if (href === currentPage) {
             link.style.borderBottom = '2px solid white';

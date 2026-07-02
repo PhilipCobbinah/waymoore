@@ -16,7 +16,7 @@
                     <img src="assets/img/products/waymoore_logo.jpg" alt="Waymoore Logo">
                 </a>
             </h2>
-            <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+            <button type="button" class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks">
                 <span></span>
                 <span></span>
                 <span></span>
@@ -33,7 +33,12 @@
                 <a href="login.html" id="user-account-link" class="user-link">
                     <i class="fas fa-user"></i>
                 </a>
+                <a href="admin/login.html" class="user-link">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Admin</span>
+                </a>
             </div>
+            <div class="nav-overlay" id="navOverlay"></div>
         </nav>
     </header>
 

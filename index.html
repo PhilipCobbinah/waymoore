@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WAYMOORE - Natural Products</title>
-    <meta name="description" content="WAYMOORE — natural wellness, beauty, and everyday care. Explore plant-based teas, haircare, soaps, feminine care and household cleaners.">
+    <meta name="description" content="WAYMOORE - natural wellness, beauty, and everyday care. Explore plant-based teas, haircare, soaps, feminine care and household cleaners.">
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -21,7 +21,6 @@
                     <img src="assets/img/products/waymoore_logo.jpg" alt="Waymoore Logo">
                 </a>
             </h2>
-            <!-- changed: add type, aria-expanded, aria-controls -->
             <button type="button" class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks">
                 <span></span>
                 <span></span>
@@ -33,11 +32,11 @@
                 <a href="about.html">About</a>
                 <a href="contact.html">Contact</a>
                 <a href="cart.html" class="cart-link">
-                    <i class="fas fa-shopping-cart"></i>
+                    <i class="fas fa-shopping-cart" aria-hidden="true"></i>
                     <span class="cart-count">0</span>
                 </a>
                 <a href="login.html" id="user-account-link" class="user-link">
-                    <i class="fas fa-user"></i>
+                    <i class="fas fa-user" aria-hidden="true"></i>
                 </a>
             </div>
             <div class="nav-overlay" id="navOverlay"></div>
@@ -45,53 +44,90 @@
     </header>
 
     <main id="main">
-        <section class="hero">
-            <div class="hero-text-slider">
-                <div class="hero-slide slide-1">
-                    <h1>Welcome to <br> WAYMOORE</h1>
-                    <p class="hero-subtitle">Your home of natural wellness, beauty, and everyday care.</p>
-                    <p class="hero-tagline">We're excited to have you here.</p>
-                    <a href="products.html" class="btn">Shop Now</a>
+        <section class="hero home-video-hero" data-home-reveal>
+            <div class="home-hero-leaf home-hero-leaf-left" aria-hidden="true"></div>
+            <div class="home-hero-leaf home-hero-leaf-right" aria-hidden="true"></div>
+
+            <div class="hero-video-stage" data-hero-video-carousel>
+                <div class="hero-video-slide active" data-hero-slide>
+                    <video muted playsinline loop preload="metadata" poster="assets/img/products/repair_brightening_body_butter.jpeg">
+                        <source src="assets/videos/hero-1.mp4" type="video/mp4">
+                    </video>
                 </div>
-                
-                <div class="hero-slide slide-2">
-                    <h2>Our Promise to You</h2>
-                    <p>At WAYMOORE, we believe wellness should be simple, natural, and accessible to every home. That's why we create high-quality, plant-based products designed to help you look good, feel good, and live healthier every single day.</p>
-                    <p>From our powerful herbal teas to our nourishing haircare essentials, skin-friendly soaps, feminine care solutions, and gentle household cleaners, every product is crafted with one goal in mind — to support your wellbeing from the inside out.</p>
-                    <a href="products.html" class="btn">Explore Products</a>
+                <div class="hero-video-slide" data-hero-slide>
+                    <video muted playsinline loop preload="metadata" poster="assets/img/categories/hair-care1.jpeg">
+                        <source src="assets/videos/hero-2.mp4" type="video/mp4">
+                    </video>
                 </div>
-                
-                <div class="hero-slide slide-3">
-                    <h2>You're in the Right Place</h2>
-                    <p>You can explore new wellness options or to find trusted natural products.</p>
-                    <p class="hero-thank-you">Thank you for choosing WAYMOORE, where nature meets everyday living.</p>
-                    <p class="hero-closing">Feel free to browse, discover, and enjoy the goodness of nature—made just for you.</p>
-                    <a href="about.html" class="btn">Learn More About Us</a>
+                <div class="hero-video-slide" data-hero-slide>
+                    <video muted playsinline loop preload="metadata" poster="assets/img/categories/health-wellness2.jpeg">
+                        <source src="assets/videos/hero-3.mp4" type="video/mp4">
+                    </video>
+                </div>
+                 <div class="hero-video-slide" data-hero-slide>
+                    <video muted playsinline loop preload="metadata" poster="assets/img/categories/health-wellness4.jpeg">
+                        <source src="assets/videos/hero-4.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="hero-video-overlay"></div>
+            </div>
+
+            <div class="home-hero-content">
+                <span class="home-hero-label">Natural Wellness &bull; Beauty &bull; Home Care</span>
+                <h1>WAYMOORE</h1>
+                <p>Plant-powered solutions for healthier everyday living.</p>
+                <div class="home-hero-actions">
+                    <a href="products.html" class="btn home-hero-primary">Shop Now</a>
+                    <a href="products.html" class="btn home-hero-secondary">Explore Products</a>
+                </div>
+                <div class="hero-slider-controls" aria-label="Hero video slides">
+                    <button type="button" class="hero-dot active" data-hero-dot="0" aria-label="Show wellness video"></button>
+                    <button type="button" class="hero-dot" data-hero-dot="1" aria-label="Show beauty video"></button>
+                    <button type="button" class="hero-dot" data-hero-dot="2" aria-label="Show home care video"></button>
+                    <span class="hero-progress" aria-hidden="true"><span></span></span>
                 </div>
             </div>
         </section>
 
-        <section class="categories-section">
-            <h2>Shop by Category</h2>
+        <section class="categories-section home-reveal-section" data-home-reveal>
+            <div class="section-kicker">Shop by Category</div>
+            <h2>Natural care for every part of daily life.</h2>
             <p>Discover our range of natural wellness products</p>
             <div class="categories-grid">
-                <div class="category-card" onclick="window.location.href='products.html'">
-                    <img src="assets/img/categories/health-wellness.jpg" alt="Health & Wellness">
-                    <h3>Health & Wellness</h3>
+                <div class="category-card home-card-reveal" onclick="window.location.href='products.html'">
+                    <img src="assets/img/categories/health-wellness4.jpeg" alt="Health & Wellness">
+                    <h3>Health &amp; Wellness</h3>
+                    <p>Herbal support, plant-based blends, and everyday vitality.</p>
                 </div>
-                <div class="category-card" onclick="window.location.href='products.html'">
-                    <img src="assets/img/categories/hair-care.jpg" alt="Hair Care">
+                <div class="category-card home-card-reveal" onclick="window.location.href='products.html'">
+                    <img src="assets/img/categories/hair-care1.jpeg" alt="Hair Care">
                     <h3>Hair Care</h3>
+                    <p>Natural oils, conditioners, and deep treatments for stronger hair.</p>
                 </div>
-                <div class="category-card" onclick="window.location.href='products.html'">
-                    <img src="assets/img/categories/skin-care.jpg" alt="Skin Care">
+                <div class="category-card home-card-reveal" onclick="window.location.href='products.html'">
+                    <img src="assets/img/categories/body_butter_botanic.png" alt="Skin Care">
                     <h3>Skin Care</h3>
+                    <p>Soaps, butters, washes, and glow-focused body care.</p>
                 </div>
-                <div class="category-card" onclick="window.location.href='products.html'">
-                    <img src="assets/img/categories/household.jpg" alt="Household">
+                <div class="category-card home-card-reveal" onclick="window.location.href='products.html'">
+                    <img src="assets/img/categories/dish_wash.png" alt="Household">
                     <h3>Household</h3>
+                    <p>Gentle, practical home care made for everyday use.</p>
+                </div>
+                <div class="category-card home-card-reveal" onclick="window.location.href='products.html'">
+                    <img src="assets/img/categories/glycerin_soap.png" alt="Household">
+                    <h3>Organic Soap</h3>
+                    <p>Amber Glycerin Soap with floral accents.</p>
                 </div>
             </div>
+        </section>
+
+        <section class="home-wellness-strip home-reveal-section" data-home-reveal>
+            <div>
+                <span class="section-kicker">Waymoore Promise</span>
+                <h2>Natural products made to support health, beauty, and confidence.</h2>
+            </div>
+            <a href="about.html" class="btn home-strip-btn">Learn More</a>
         </section>
     </main>
 
@@ -125,68 +161,5 @@
     <script src="assets/js/cart.js"></script>
     <script src="assets/js/app.js"></script>
     <script src="assets/js/hero.js"></script>
-
-    <script>
-        // Fix for mobile navigation toggle - runs after all other scripts
-        (function() {
-            setTimeout(function() {
-                const hamburger = document.getElementById('hamburger');
-                const navLinks = document.getElementById('navLinks');
-                const navOverlay = document.getElementById('navOverlay');
-
-                if (hamburger && navLinks) {
-                    const newHamburger = hamburger.cloneNode(true);
-                    hamburger.parentNode.replaceChild(newHamburger, hamburger);
-                    
-                    function closeMenu() {
-                        navLinks.classList.remove('active');
-                        newHamburger.classList.remove('active');
-                        newHamburger.setAttribute('aria-expanded', 'false');
-                        if (navOverlay) navOverlay.classList.remove('active');
-                        document.body.style.overflow = ''; // Re-enable scrolling
-                    }
-                    
-                    function openMenu() {
-                        navLinks.classList.add('active');
-                        newHamburger.classList.add('active');
-                        newHamburger.setAttribute('aria-expanded', 'true');
-                        if (navOverlay) navOverlay.classList.add('active');
-                        document.body.style.overflow = 'hidden'; // Prevent background scrolling
-                    }
-                    
-                    newHamburger.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        
-                        if (navLinks.classList.contains('active')) {
-                            closeMenu();
-                        } else {
-                            openMenu();
-                        }
-                    });
-
-                    // Close menu when clicking overlay
-                    if (navOverlay) {
-                        navOverlay.addEventListener('click', closeMenu);
-                    }
-
-                    // Close menu when clicking outside
-                    document.addEventListener('click', function(e) {
-                        if (navLinks.classList.contains('active') && 
-                            !navLinks.contains(e.target) && 
-                            !newHamburger.contains(e.target)) {
-                            closeMenu();
-                        }
-                    });
-
-                    // Close menu when clicking a link
-                    const links = navLinks.querySelectorAll('a');
-                    links.forEach(function(link) {
-                        link.addEventListener('click', closeMenu);
-                    });
-                }
-            }, 100);
-        })();
-    </script>
 </body>
 </html>

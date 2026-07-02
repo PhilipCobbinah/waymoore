@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="assets/css/style-about-fix.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="about-body">
     <header>
         <nav>
             <h2>
@@ -16,7 +16,6 @@
                     <img src="assets/img/products/waymoore_logo.jpg" alt="Waymoore Logo">
                 </a>
             </h2>
-            <!-- changed: add type, aria-expanded, aria-controls -->
             <button type="button" class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks">
                 <span></span>
                 <span></span>
@@ -28,97 +27,193 @@
                 <a href="about.html">About</a>
                 <a href="contact.html">Contact</a>
                 <a href="cart.html" class="cart-link">
-                    <i class="fas fa-shopping-cart"></i>
+                    <i class="fas fa-shopping-cart" aria-hidden="true"></i>
                     <span class="cart-count">0</span>
                 </a>
                 <a href="login.html" id="user-account-link" class="user-link">
-                    <i class="fas fa-user"></i>
+                    <i class="fas fa-user" aria-hidden="true"></i>
                 </a>
             </div>
+            <div class="nav-overlay" id="navOverlay"></div>
         </nav>
     </header>
 
-    <main>
-        <section class="about">
-            <div class="about-container">
-                <div class="about-content">
-                    <h1>About <br> WAYMOORE</h1>
-                    
-                    <p class="intro">
-                       <b>WAYMOORE</b>  is a proudly African health, beauty, and home-care brand dedicated to promoting natural wellness and everyday living through safe, effective, and plant-based products.
+    <main class="about-page">
+        <section class="about-section about-hero">
+            <span class="leaf-cluster leaf-cluster-left" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+            </span>
+            <div class="about-shell about-hero-grid">
+                <div class="about-copy about-animate">
+                    <span class="about-label">About</span>
+                    <h1>WAYMOORE</h1>
+                    <span class="about-underline" aria-hidden="true"></span>
+                    <p class="about-lead">
+                        <b>WAYMOORE</b> is a proudly African health, beauty, and home-care brand dedicated to promoting natural wellness and everyday living through safe, effective, and plant-based products.
                     </p>
-                    
                     <p>
-                        Our <b>mission</b> is simple: to help individuals and families live healthier, more confident, and more vibrant lives using nature-powered solutions they can trust.
+                        We believe that true wellness goes beyond what you eat or drink. It includes how you care for your body, your hair, your skin, and even your home.
                     </p>
-                    
-                    <p>
-                        We believe that true wellness goes beyond what you eat or drink—it includes how you care for your body, your hair, your skin, and even your home. That is why our product line is intentionally diverse, covering internal wellness, personal care, beauty enhancement, and household essentials.
-                    </p>
-                    
-                    <p>
-                        Every <b>WAYMOORE </b>product is thoughtfully crafted to deliver real results without relying on harsh chemicals. From our nutrient-rich plant-based protein mixes to our revitalizing hair care formulas, refreshing teas, feminine care products, and gentle home-care solutions, each item is created with quality ingredients and customer well-being at the center.
-                    </p>
-                    
-                    <h2>Our Philosophy</h2>
-                    
-                    <p>At WAYMOORE, we are guided by three core principles:</p>
-                    
-                    <div class="philosophy-cards">
-                        <div class="philosophy-card">
-                            <i class="fas fa-leaf"></i>
-                            <h3>Nature First</h3>
-                            <p>We prioritize natural, plant-based ingredients known for their healing, nourishing, and protective properties.</p>
-                        </div>
-                        <div class="philosophy-card">
-                            <i class="fas fa-heart"></i>
-                            <h3>Holistic Wellness</h3>
-                            <p>We design products that support the whole person—internally and externally.</p>
-                        </div>
-                        <div class="philosophy-card">
-                            <i class="fas fa-star"></i>
-                            <h3>Everyday Simplicity</h3>
-                            <p>Wellness should be simple, accessible, and a part of daily life. Our products make that possible.</p>
-                        </div>
-                    </div>
-                    
-                    <h2>Our Product Range</h2>
-                    
-                    <p>Our wide range of offerings includes:</p>
-                    
-                    <ul class="product-categories">
-                        <li><strong>Health & Wellness:</strong> Slim Tea, Man Power, Everywoman Combo, Infection Cleanser, and plant-based nutritional mixes.</li>
-                        <li><strong>Hair Care:</strong> Growth oils, conditioners, African black shampoo, and deep treatment masks designed for strong, healthy, natural hair.</li>
-                        <li><strong>Beauty & Body Care:</strong> Soaps, feminine wash, enhancement oils, shower gels, and moisturizing hand wash.</li>
-                        <li><strong>Household Essentials:</strong> Powerful, safe, plant-based dishwashing liquid and heavy-duty car wash solutions.</li>
-                    </ul>
-                    
-                    <p>
-                        Each category is designed to complement the others, creating a seamless ecosystem of wellness for you, your family, and your home.
-                    </p>
-                    
-                    <h2>Our Commitment</h2>
-                    
-                    <ul class="commitment-list">
-                        <li><i class="fas fa-check-circle"></i> Continuous quality improvement</li>
-                        <li><i class="fas fa-check-circle"></i> Affordable and accessible natural products</li>
-                        <li><i class="fas fa-check-circle"></i> Transparency in ingredients and benefits</li>
-                        <li><i class="fas fa-check-circle"></i> Empowering customers with safe alternatives to chemical-based products</li>
-                    </ul>
-                    
-                    <p class="closing">
-                        <b>WAYMOORE</b> continues to grow because of the trust and love of thousands of customers who believe in natural solutions that truly work. We are here to serve you—your health, your beauty, and your confidence.
-                    </p>
+                    <a href="#about-mission" class="btn about-primary-btn">Our Mission</a>
                 </div>
-                
-                <div class="about-showcase">
-                    <div class="product-showcase">
-                        <div class="showcase-image">
-                            <img id="showcase-img" src="" alt="Product Showcase">
-                        </div>
+
+                <div class="about-visual about-visual-hero image-float image-fade about-animate">
+                    <div class="premium-image-frame hero-image-frame">
+                        <img class="premium-image" src="assets/img/categories/about_image.jpeg" alt="Waymoore Repair Brightening Body Butter">
+                    </div>
+                    <div class="floating-note">
+                        <i class="fas fa-leaf" aria-hidden="true"></i>
+                        <span>Plant-based care</span>
                     </div>
                 </div>
             </div>
+        </section>
+
+        <section class="about-section about-mission about-soft-band" id="about-mission">
+            <div class="about-shell about-two-column">
+                <div class="about-copy about-animate">
+                    <span class="about-label">Our Mission</span>
+                    <h2>Helping families live healthier, more confident lives.</h2>
+                    <span class="about-underline" aria-hidden="true"></span>
+                    <p>
+                        Our <b>mission</b> is simple: to help individuals and families live healthier, more confident, and more vibrant lives using nature-powered solutions they can trust.
+                    </p>
+                    <p>
+                        Every <b>WAYMOORE</b> product is thoughtfully crafted to deliver real results without relying on harsh chemicals.
+                    </p>
+                </div>
+
+                <div class="about-visual image-slide-right about-animate">
+                    <div class="premium-image-frame">
+                        <img class="premium-image" src="assets/img/categories/health-wellness1.jpeg" alt="Natural wellness products and botanical ingredients">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="about-section about-range">
+            <div class="about-shell">
+                <div class="about-section-heading about-animate">
+                    <span class="about-label">Our Product Range</span>
+                    <h2>Wellness for your body, beauty, and home.</h2>
+                    <span class="about-underline centered" aria-hidden="true"></span>
+                    <p>
+                        Our product line is intentionally diverse, covering internal wellness, personal care, beauty enhancement, and household essentials. Each category is designed to complement the others, creating a seamless ecosystem of wellness for you, your family, and your home.
+                    </p>
+                </div>
+
+                <div class="range-feature-grid">
+                    <article class="range-feature about-animate image-slide-left">
+                        <div class="premium-image-frame range-image">
+                            <img class="premium-image" src="assets/img/categories/health-wellness2.jpeg" alt="Waymoore health and wellness products">
+                        </div>
+                        <div class="range-card">
+                            <i class="fas fa-seedling" aria-hidden="true"></i>
+                            <h3>Health &amp; Wellness</h3>
+                            <p>Slim Tea, Man Power, Everywoman Combo, Infection Cleanser, and plant-based nutritional mixes.</p>
+                        </div>
+                    </article>
+
+                    <article class="range-feature range-feature-reverse about-animate image-slide-right">
+                        <div class="premium-image-frame range-image">
+                            <img class="premium-image" src="assets/img/products/Hair-shampoo.jpeg" alt="Waymoore hair care products">
+                        </div>
+                        <div class="range-card">
+                            <i class="fas fa-spa" aria-hidden="true"></i>
+                            <h3>Hair Care</h3>
+                            <p>Growth oils, conditioners, African black shampoo, and deep treatment masks designed for strong, healthy, natural hair.</p>
+                        </div>
+                    </article>
+
+                    <article class="range-feature about-animate image-slide-left">
+                        <div class="premium-image-frame range-image">
+                            <img class="premium-image" src="assets/img/categories/body_butter_botanic.png" alt="Waymoore skin and body care products">
+                        </div>
+                        <div class="range-card">
+                            <i class="fas fa-hand-holding-heart" aria-hidden="true"></i>
+                            <h3>Skin &amp; Body Care</h3>
+                            <p>Soaps, feminine wash, enhancement oils, shower gels, and moisturizing hand wash.</p>
+                        </div>
+                    </article>
+
+                    <article class="range-feature range-feature-reverse about-animate image-slide-right">
+                        <div class="premium-image-frame range-image">
+                            <img class="premium-image" src="assets/img/categories/dish_wash.png" alt="Waymoore household essentials">
+                        </div>
+                        <div class="range-card">
+                            <i class="fas fa-home" aria-hidden="true"></i>
+                            <h3>Household Essentials</h3>
+                            <p>Powerful, safe, plant-based dishwashing liquid and heavy-duty car wash solutions.</p>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="about-section about-philosophy about-soft-band">
+            <span class="leaf-cluster leaf-cluster-right" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+            </span>
+            <div class="about-shell">
+                <div class="about-section-heading about-animate">
+                    <span class="about-label">Our Philosophy</span>
+                    <h2>The Waymoore Way</h2>
+                    <span class="about-underline centered" aria-hidden="true"></span>
+                    <p>At WAYMOORE, we are guided by three core principles:</p>
+                </div>
+
+                <div class="philosophy-cards">
+                    <article class="philosophy-card about-animate">
+                        <i class="fas fa-leaf" aria-hidden="true"></i>
+                        <h3>Nature First</h3>
+                        <p>We prioritize natural, plant-based ingredients known for their healing, nourishing, and protective properties.</p>
+                    </article>
+                    <article class="philosophy-card about-animate">
+                        <i class="fas fa-heart" aria-hidden="true"></i>
+                        <h3>Holistic Wellness</h3>
+                        <p>We design products that support the whole person, internally and externally.</p>
+                    </article>
+                    <article class="philosophy-card about-animate">
+                        <i class="fas fa-star" aria-hidden="true"></i>
+                        <h3>Everyday Simplicity</h3>
+                        <p>Wellness should be simple, accessible, and a part of daily life. Our products make that possible.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="about-section about-commitment">
+            <div class="about-shell about-two-column commitment-grid">
+                <div class="about-visual image-slide-left about-animate">
+                    <div class="premium-image-frame">
+                        <img class="premium-image" src="assets/img/products/ayurvedic_hair_growth_butter.jpeg" alt="Waymoore natural hair growth butter">
+                    </div>
+                </div>
+
+                <div class="about-copy about-animate">
+                    <span class="about-label">Our Commitment</span>
+                    <h2>Committed to quality, transparency, and trust.</h2>
+                    <span class="about-underline" aria-hidden="true"></span>
+                    <ul class="commitment-list">
+                        <li><i class="fas fa-check-circle" aria-hidden="true"></i> Continuous quality improvement</li>
+                        <li><i class="fas fa-check-circle" aria-hidden="true"></i> Affordable and accessible natural products</li>
+                        <li><i class="fas fa-check-circle" aria-hidden="true"></i> Transparency in ingredients and benefits</li>
+                        <li><i class="fas fa-check-circle" aria-hidden="true"></i> Empowering customers with safe alternatives to chemical-based products</li>
+                    </ul>
+                    <p class="closing">
+                        <b>WAYMOORE</b> continues to grow because of the trust and love of thousands of customers who believe in natural solutions that truly work. We are here to serve you, your health, your beauty, and your confidence.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="about-cta about-animate">
+            <h2>Ready to start your wellness journey?</h2>
+            <a href="products.html" class="btn about-cta-btn">Shop Now</a>
         </section>
     </main>
 

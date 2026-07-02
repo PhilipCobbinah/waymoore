@@ -17,7 +17,7 @@
                 <img src="assets/img/products/waymoore_logo.jpg" alt="Waymoore Logo">
             </a>
         </h2>
-        <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+        <button type="button" class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks">
             <span></span>
             <span></span>
             <span></span>
@@ -35,32 +35,25 @@
                 <i class="fas fa-user"></i>
             </a>
         </div>
+        <div class="nav-overlay" id="navOverlay"></div>
     </nav>
 </header>
 
-<h2 style="text-align:center; padding-top:20px;">Our Products</h2>
+<main>
+    <section class="products-page">
+        <h1>Our Products</h1>
 
-<!-- Featured Products Slider -->
-<div class="featured-products">
-    <div class="product-slider">
-        <button class="slider-nav prev" aria-label="Previous products">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-        <div class="slider-wrapper">
-            <div class="slider-container"></div>
+        <div class="product-filters" role="group" aria-label="Filter products by category">
+            <button type="button" class="filter-btn active" data-category="All">All</button>
+            <button type="button" class="filter-btn" data-category="Health & Wellness">Health & Wellness</button>
+            <button type="button" class="filter-btn" data-category="Hair Care">Hair Care</button>
+            <button type="button" class="filter-btn" data-category="Skin Care">Skin Care</button>
+            <button type="button" class="filter-btn" data-category="Household">Household</button>
         </div>
-        <button class="slider-nav next" aria-label="Next products">
-            <i class="fas fa-chevron-right"></i>
-        </button>
-    </div>
-    <div class="slider-dots"></div>
-    <div style="text-align:center; margin: 30px 0;">
-        <button class="btn view-all-btn" onclick="toggleAllProducts()">View All Products</button>
-    </div>
-</div>
 
-<!-- All Products Grid (Hidden by default) -->
-<div class="product-list" style="display:none;"></div>
+        <div class="product-list" id="product-grid"></div>
+    </section>
+</main>
 
 <div class="modal"></div>
 

@@ -16,7 +16,7 @@
                     <img src="assets/img/products/waymoore_logo.jpg" alt="Waymoore Logo">
                 </a>
             </h2>
-            <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+            <button type="button" class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks">
                 <span></span>
                 <span></span>
                 <span></span>
@@ -186,59 +186,5 @@
     <script src="assets/js/checkout.js"></script>
     <script src="assets/js/app.js"></script>
 
-    <script>
-        // Fix for mobile navigation toggle
-        (function() {
-            const hamburger = document.getElementById('hamburger');
-            const navLinks = document.getElementById('navLinks');
-            const navOverlay = document.getElementById('navOverlay');
-
-            if (hamburger && navLinks) {
-                function closeMenu() {
-                    navLinks.classList.remove('active');
-                    hamburger.classList.remove('active');
-                    hamburger.setAttribute('aria-expanded', 'false');
-                    if (navOverlay) navOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-                
-                function openMenu() {
-                    navLinks.classList.add('active');
-                    hamburger.classList.add('active');
-                    hamburger.setAttribute('aria-expanded', 'true');
-                    if (navOverlay) navOverlay.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                }
-
-                hamburger.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    if (navLinks.classList.contains('active')) {
-                        closeMenu();
-                    } else {
-                        openMenu();
-                    }
-                });
-
-                if (navOverlay) {
-                    navOverlay.addEventListener('click', closeMenu);
-                }
-
-                document.addEventListener('click', function(e) {
-                    if (navLinks.classList.contains('active') && 
-                        !navLinks.contains(e.target) && 
-                        !hamburger.contains(e.target)) {
-                        closeMenu();
-                    }
-                });
-
-                const links = navLinks.querySelectorAll('a');
-                links.forEach(function(link) {
-                    link.addEventListener('click', closeMenu);
-                });
-            }
-        })();
-    </script>
 </body>
 </html>

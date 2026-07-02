@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - WAYMOORE</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="admin-auth-body">
+    <div class="leaf leaf-one"></div>
+    <div class="leaf leaf-two"></div>
+    <div class="leaf leaf-three"></div>
+
+    <div class="auth-card">
+        <div class="auth-card__brand">
+            <img src="../assets/img/products/waymoore_logo.jpg" alt="Waymoore logo">
+            <div>
+                <p class="eyebrow">WAYMOORE CMS</p>
+                <h1>Admin Access</h1>
+            </div>
+        </div>
+
+        <a href="../index.html" class="back-link" aria-label="Return to the user page">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back to user page</span>
+        </a>
+
+        <form id="admin-login-form" class="auth-form">
+            <div class="form-group">
+                <label for="admin-email">Email</label>
+                <input type="email" id="admin-email" name="email" placeholder="admin@waymoore.com" required>
+            </div>
+            <div class="form-group">
+                <label for="admin-password">Password</label>
+                <input type="password" id="admin-password" name="password" placeholder="Enter password" required>
+            </div>
+            <div class="auth-row">
+                <label class="checkbox-row">
+                    <input type="checkbox" name="remember">
+                    <span>Remember me</span>
+                </label>
+                <a href="#" class="text-link">Forgot password?</a>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Login to Dashboard</button>
+        </form>
+
+        <div class="auth-card__footer">
+            <p>Use admin credentials:</p>
+            <span>admin123@waymoore / waymoore@admin123</span>
+        </div>
+    </div>
+
+    <script src="js/admin.js"></script>
+</body>
+</html>

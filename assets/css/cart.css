@@ -543,6 +543,11 @@
 }
 
 @media (max-width: 768px) {
+    .cart-container {
+        display: flex;
+        flex-direction: column;
+    }
+
     .cart-header {
         flex-direction: column;
         align-items: flex-start;

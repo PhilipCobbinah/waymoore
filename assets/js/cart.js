@@ -18,8 +18,9 @@ const CartManager = {
         }, 1000); // Update every second
     },
 
-    addToCart(productId) {
-        console.log('CartManager.addToCart called with ID:', productId);
+    addToCart(productId, quantity = 1) {
+        const quantityToAdd = Math.max(1, parseInt(quantity, 10) || 1);
+        console.log('CartManager.addToCart called with ID:', productId, 'quantity:', quantityToAdd);
         
         if (!AuthManager || !AuthManager.isLoggedIn()) {
             console.log('User not logged in');
@@ -66,7 +67,7 @@ const CartManager = {
         const cartItem = users[userIndex].cart.find(item => item.productId === productId);
         
         if (cartItem) {
-            cartItem.quantity += 1;
+            cartItem.quantity += quantityToAdd;
             console.log(`Increased quantity to ${cartItem.quantity}`);
         } else {
             users[userIndex].cart.push({
@@ -75,7 +76,7 @@ const CartManager = {
                 price: product.price,
                 image: product.image,
                 category: product.category || 'Product',
-                quantity: 1
+                quantity: quantityToAdd
             });
             console.log('Added new item to cart');
         }
@@ -86,8 +87,8 @@ const CartManager = {
 
         const itemTotal = this.calculateCartTotal(users[userIndex].cart);
         const message = cartItem 
-            ? `✅ ${product.name}\n\nQuantity increased to ${cartItem.quantity}\n\nCart Total: ₵${itemTotal.toFixed(2)}`
-            : `✅ ${product.name}\n\nAdded to cart!\n\nPrice: ${product.price}\n\nCart Total: ₵${itemTotal.toFixed(2)}`;
+            ? `✅ ${product.name}\n\nAdded ${quantityToAdd} more. Quantity is now ${cartItem.quantity}\n\nCart Total: ₵${itemTotal.toFixed(2)}`
+            : `✅ ${product.name}\n\nAdded to cart!\n\nQuantity: ${quantityToAdd}\nPrice: ${product.price}\n\nCart Total: ₵${itemTotal.toFixed(2)}`;
         
         alert(message);
 
@@ -104,8 +105,8 @@ const CartManager = {
     calculateCartTotal(cart) {
         let total = 0;
         cart.forEach(item => {
-            const price = parseFloat(item.price.replace('₵', ''));
-            total += price * item.quantity;
+            const price = parseFloat(String(item.price).replace(/[^\d.]/g, ''));
+            total += (Number.isFinite(price) ? price : 0) * item.quantity;
         });
         return total;
     },
@@ -339,8 +340,9 @@ const CartManager = {
             
             <div class="cart-items-list">
                 ${user.cart.map((item, index) => {
-                    const itemPrice = parseFloat(item.price.replace('₵', ''));
-                    const itemTotal = itemPrice * item.quantity;
+                    const itemPrice = parseFloat(String(item.price).replace(/[^\d.]/g, ''));
+                    const safeItemPrice = Number.isFinite(itemPrice) ? itemPrice : 0;
+                    const itemTotal = safeItemPrice * item.quantity;
                     
                     return `
                         <div class="cart-item">
@@ -369,7 +371,7 @@ const CartManager = {
                             <div class="cart-item-total">
                                 <p class="item-total-label">Item Total</p>
                                 <p class="item-total-price">₵${itemTotal.toFixed(2)}</p>
-                                <p class="item-calculation">${item.quantity} × ₵${itemPrice.toFixed(2)}</p>
+                                <p class="item-calculation">${item.quantity} × ₵${safeItemPrice.toFixed(2)}</p>
                             </div>
                             <button class="remove-btn" onclick="CartManager.removeFromCart(${item.productId})" title="Remove from cart">
                                 <i class="fas fa-trash"></i>
@@ -421,8 +423,9 @@ const CartManager = {
             `;
 
             user.cart.forEach((item, i) => {
-                const itemPrice = parseFloat(item.price.replace('₵', ''));
-                const itemTotal = itemPrice * item.quantity;
+                const itemPrice = parseFloat(String(item.price).replace(/[^\d.]/g, ''));
+                const safeItemPrice = Number.isFinite(itemPrice) ? itemPrice : 0;
+                const itemTotal = safeItemPrice * item.quantity;
                 
                 productListHTML += `
                     <div class="summary-product-item">

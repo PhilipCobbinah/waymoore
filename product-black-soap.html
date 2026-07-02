@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WAYMOORE Repair Black Soap</title>
+    <meta name="description" content="WAYMOORE Repair Black Soap is a herbal cleansing soap crafted with African black soap and botanicals to deeply cleanse and support healthy-looking skin.">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <h2>
+                <a href="index.html">
+                    <img src="assets/img/products/waymoore_logo.jpg" alt="Waymoore Logo">
+                </a>
+            </h2>
+            <button type="button" class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html">Home</a>
+                <a href="products.html">Products</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="cart.html" class="cart-link">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </a>
+                <a href="login.html" id="user-account-link" class="user-link">
+                    <i class="fas fa-user"></i>
+                </a>
+            </div>
+            <div class="nav-overlay" id="navOverlay"></div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="product-detail-page black-soap-page">
+            <div class="product-breadcrumb" aria-label="Breadcrumb">
+                <a href="index.html">Home</a>
+                <span>&gt;</span>
+                <a href="products.html">Products</a>
+                <span>&gt;</span>
+                <a href="products.html">Skin Care</a>
+                <span>&gt;</span>
+                <strong>Repair Black Soap</strong>
+            </div>
+
+            <div class="product-detail-hero">
+                <div class="product-detail-media">
+                    <div class="product-image-placeholder product-detail-placeholder">Product Image</div>
+                </div>
+
+                <div class="product-detail-summary">
+                    <span class="category-badge">Skin Care</span>
+                    <h1 class="dark-product-title">WAYMOORE REPAIR BLACK SOAP</h1>
+                    <p class="product-detail-description">
+                        A powerful herbal cleansing soap specially crafted to help repair damaged skin, deeply cleanse impurities, and restore healthy-looking skin naturally. Enriched with African black soap and botanical ingredients.
+                    </p>
+                    <p class="product-detail-price">&cent;XX</p>
+
+                    <div class="detail-quantity-row">
+                        <span>Quantity</span>
+                        <div class="quantity-selector" aria-label="Select quantity">
+                            <button type="button" class="quantity-step" id="black-soap-minus" aria-label="Decrease quantity">-</button>
+                            <span id="black-soap-quantity" class="quantity-number">1</span>
+                            <button type="button" class="quantity-step" id="black-soap-plus" aria-label="Increase quantity">+</button>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn product-detail-cart-btn" id="black-soap-add-to-cart">
+                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                    </button>
+                </div>
+            </div>
+
+            <div class="product-tabs" data-product-tabs>
+                <div class="tab-controls" role="tablist" aria-label="Repair Black Soap product details">
+                    <button type="button" class="tab-btn active" role="tab" aria-selected="true" aria-controls="black-soap-benefits-panel" id="black-soap-benefits-tab" data-tab="benefits">Benefits</button>
+                    <button type="button" class="tab-btn" role="tab" aria-selected="false" aria-controls="black-soap-ingredients-panel" id="black-soap-ingredients-tab" data-tab="ingredients">Key Ingredients</button>
+                    <button type="button" class="tab-btn" role="tab" aria-selected="false" aria-controls="black-soap-directions-panel" id="black-soap-directions-tab" data-tab="directions">Directions for Use</button>
+                </div>
+
+                <div class="tab-panel active" role="tabpanel" id="black-soap-benefits-panel" aria-labelledby="black-soap-benefits-tab" data-panel="benefits">
+                    <ul class="benefits-checklist">
+                        <li><i class="fas fa-check"></i> Helps repair damaged and troubled skin</li>
+                        <li><i class="fas fa-check"></i> Deeply cleanses dirt, excess oil, and impurities</li>
+                        <li><i class="fas fa-check"></i> Helps reduce acne, pimples, and dark spots</li>
+                        <li><i class="fas fa-check"></i> Supports clearer and smoother skin</li>
+                        <li><i class="fas fa-check"></i> Helps soothe skin irritation and uneven skin tone</li>
+                        <li><i class="fas fa-check"></i> Assists in removing dead skin cells naturally</li>
+                        <li><i class="fas fa-check"></i> Helps restore healthy, refreshed, and glowing skin</li>
+                        <li><i class="fas fa-check"></i> Suitable for face and body cleansing</li>
+                    </ul>
+                </div>
+
+                <div class="tab-panel" role="tabpanel" id="black-soap-ingredients-panel" aria-labelledby="black-soap-ingredients-tab" data-panel="ingredients" hidden>
+                    <div class="ingredient-tags">
+                        <span>African Black Soap</span>
+                        <span>Shea Butter</span>
+                        <span>Aloe Vera</span>
+                        <span>Coconut Oil</span>
+                        <span>Turmeric</span>
+                        <span>Tea Tree Oil</span>
+                    </div>
+                </div>
+
+                <div class="tab-panel" role="tabpanel" id="black-soap-directions-panel" aria-labelledby="black-soap-directions-tab" data-panel="directions" hidden>
+                    <h3>Directions for Use</h3>
+                    <p>Apply to wet skin, lather gently, and rinse thoroughly. Use daily for best results.</p>
+                </div>
+            </div>
+
+            <section class="product-power-banner">
+                <h2>Pure. Herbal. Powerful.</h2>
+                <p>WayMoore Repair Black Soap &mdash; crafted with nature to restore your skin.</p>
+            </section>
+
+            <section class="related-products related-products-two">
+                <h2>You May Also Like</h2>
+                <div class="related-product-grid">
+                    <a class="related-card" href="product-body-butter.html">
+                        <div class="product-image-placeholder related-placeholder">Product Image</div>
+                        <h3>WAYMOORE REPAIR BRIGHTENING BODY BUTTER</h3>
+                        <span class="category-badge">Skin Care</span>
+                    </a>
+                    <a class="related-card" href="products.html">
+                        <img src="assets/img/products/waymore_Glysolin soap.jpg" alt="Glycerin Anti-Aging Soap">
+                        <h3>Glycerin Anti-Aging Soap</h3>
+                        <span class="category-badge">Skin Care</span>
+                    </a>
+                </div>
+            </section>
+
+            <p class="closing-product-tagline">Restore your skin naturally with the deep cleansing power of WayMoore Repair Black Soap.</p>
+        </section>
+    </main>
+
+    <footer>
+        <div class="social-media">
+            <a href="https://facebook.com" target="_blank" class="social-link facebook" title="Facebook">
+                <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="https://instagram.com" target="_blank" class="social-link instagram" title="Instagram">
+                <i class="fab fa-instagram"></i>
+            </a>
+            <a href="https://twitter.com" target="_blank" class="social-link twitter" title="X (Twitter)">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor" width="18" height="18">
+                    <path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/>
+                </svg>
+            </a>
+            <a href="https://youtube.com" target="_blank" class="social-link youtube" title="YouTube">
+                <i class="fab fa-youtube"></i>
+            </a>
+            <a href="https://tiktok.com" target="_blank" class="social-link tiktok" title="TikTok">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor" width="20" height="20">
+                    <path d="M448 209.9a210.1 210.1 0 0 1 -122.8-39.3V349.4A162.6 162.6 0 1 1 185 188.3V278.2a74.6 74.6 0 1 0 52.2 71.2V0l88 0a121.2 121.2 0 0 0 1.9 22.2h0A122.2 122.2 0 0 0 381 102.4a121.4 121.4 0 0 0 67 20.1z"/>
+                </svg>
+            </a>
+        </div>
+        <p>&copy; 2024 Waymoore Shop. All rights reserved.</p>
+    </footer>
+
+    <script src="assets/js/products.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/cart.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabButtons = document.querySelectorAll('[data-product-tabs] .tab-btn');
+            const panels = document.querySelectorAll('[data-product-tabs] .tab-panel');
+            const quantityEl = document.getElementById('black-soap-quantity');
+            const minusBtn = document.getElementById('black-soap-minus');
+            const plusBtn = document.getElementById('black-soap-plus');
+            const addToCartButton = document.getElementById('black-soap-add-to-cart');
+            let quantity = 1;
+
+            function renderQuantity() {
+                quantityEl.textContent = quantity;
+                minusBtn.disabled = quantity <= 1;
+            }
+
+            tabButtons.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    const activeTab = button.dataset.tab;
+
+                    tabButtons.forEach(function(tabButton) {
+                        const isActive = tabButton === button;
+                        tabButton.classList.toggle('active', isActive);
+                        tabButton.setAttribute('aria-selected', isActive ? 'true' : 'false');
+                    });
+
+                    panels.forEach(function(panel) {
+                        const isActive = panel.dataset.panel === activeTab;
+                        panel.classList.toggle('active', isActive);
+                        panel.hidden = !isActive;
+                    });
+                });
+            });
+
+            minusBtn.addEventListener('click', function() {
+                quantity = Math.max(1, quantity - 1);
+                renderQuantity();
+            });
+
+            plusBtn.addEventListener('click', function() {
+                quantity += 1;
+                renderQuantity();
+            });
+
+            addToCartButton.addEventListener('click', function() {
+                if (typeof CartManager !== 'undefined' && CartManager.addToCart) {
+                    CartManager.addToCart(23, quantity);
+                    return;
+                }
+
+                addToCart(23);
+            });
+
+            renderQuantity();
+        });
+    </script>
+</body>
+</html>
