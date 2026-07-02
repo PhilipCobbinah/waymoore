@@ -1,5 +1,121 @@
 console.log('=== App.js Starting ===');
 
+function initGlobalDialogs() {
+    if (document.getElementById('global-dialog')) return;
+
+    const dialog = document.createElement('div');
+    dialog.id = 'global-dialog';
+    dialog.className = 'modal';
+    dialog.style.display = 'none';
+    dialog.innerHTML = `
+        <div class="modal-content global-dialog-content">
+            <button class="close" type="button" id="dialog-close">&times;</button>
+            <h2 id="dialog-title"></h2>
+            <div id="dialog-body" class="dialog-body"></div>
+            <div id="dialog-actions" class="dialog-actions"></div>
+        </div>
+    `;
+    document.body.appendChild(dialog);
+
+    dialog.addEventListener('click', (event) => {
+        if (event.target === dialog) closeGlobalDialog();
+    });
+
+    document.getElementById('dialog-close')?.addEventListener('click', closeGlobalDialog);
+}
+
+function closeGlobalDialog() {
+    const dialog = document.getElementById('global-dialog');
+    if (!dialog) return;
+
+    dialog.style.display = 'none';
+    const titleEl = document.getElementById('dialog-title');
+    const bodyEl = document.getElementById('dialog-body');
+    const actionsEl = document.getElementById('dialog-actions');
+    if (titleEl) titleEl.textContent = '';
+    if (bodyEl) bodyEl.textContent = '';
+    if (actionsEl) actionsEl.innerHTML = '';
+}
+
+function showDialog(title, message, buttons = []) {
+    initGlobalDialogs();
+
+    const dialog = document.getElementById('global-dialog');
+    const titleEl = document.getElementById('dialog-title');
+    const bodyEl = document.getElementById('dialog-body');
+    const actionsEl = document.getElementById('dialog-actions');
+    if (!dialog || !titleEl || !bodyEl || !actionsEl) return;
+
+    titleEl.textContent = title;
+    bodyEl.textContent = message;
+    actionsEl.innerHTML = '';
+
+    buttons.forEach((buttonConfig) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = buttonConfig.text;
+        button.className = buttonConfig.className || 'btn';
+        button.addEventListener('click', () => {
+            if (buttonConfig.onClick) buttonConfig.onClick();
+            closeGlobalDialog();
+        });
+        actionsEl.appendChild(button);
+    });
+
+    dialog.style.display = 'grid';
+}
+
+function showConfirmationDialog(message, onConfirm, onCancel, options = {}) {
+    showDialog(
+        options.title || 'Confirm action',
+        message,
+        [
+            {
+                text: options.cancelText || 'Cancel',
+                className: 'btn btn-secondary',
+                onClick: onCancel,
+            },
+            {
+                text: options.confirmText || 'Confirm',
+                className: 'btn btn-primary',
+                onClick: onConfirm,
+            },
+        ]
+    );
+}
+
+function showMessageDialog(title, message, onClose, confirmText = 'OK') {
+    showDialog(
+        title,
+        message,
+        [
+            {
+                text: confirmText,
+                className: 'btn btn-primary',
+                onClick: onClose,
+            },
+        ]
+    );
+}
+
+function showToast(message, type = 'success') {
+    let container = document.querySelector('.toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 2800);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM Content Loaded - Initializing app');
     
@@ -77,11 +193,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const message = document.getElementById('message').value;
             
             if (name && email && message) {
-                alert(`Thank you, ${name}!\n\nYour message has been received. We will get back to you soon at ${email}.`);
+                showToast(`Thank you, ${name}! Your message has been received. We will get back to you soon at ${email}.`, 'success');
                 contactForm.reset();
             }
         });
     }
+
     
     // ===== HIGHLIGHT ACTIVE PAGE =====
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';

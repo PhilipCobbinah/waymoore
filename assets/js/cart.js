@@ -24,7 +24,7 @@ const CartManager = {
         
         if (!AuthManager || !AuthManager.isLoggedIn()) {
             console.log('User not logged in');
-            alert('🔐 Please login to add items to cart!\n\nYou need an account to save your cart items.');
+            showToast('🔐 Please login to add items to cart! You need an account to save your cart items.', 'error');
             window.location.href = 'login.html';
             return;
         }
@@ -35,7 +35,7 @@ const CartManager = {
         // Ensure products array exists
         if (typeof products === 'undefined' || !products) {
             console.error('Products array not found');
-            alert('Product catalog not loaded. Please refresh the page.');
+            showToast('Product catalog not loaded. Please refresh the page.', 'error');
             return;
         }
         
@@ -43,7 +43,7 @@ const CartManager = {
         
         if (!product) {
             console.error('Product not found with ID:', productId);
-            alert('Product not found!');
+            showToast('Product not found.', 'error');
             return;
         }
 
@@ -90,7 +90,7 @@ const CartManager = {
             ? `✅ ${product.name}\n\nAdded ${quantityToAdd} more. Quantity is now ${cartItem.quantity}\n\nCart Total: ₦${itemTotal.toFixed(2)}`
             : `✅ ${product.name}\n\nAdded to cart!\n\nQuantity: ${quantityToAdd}\nPrice: ${product.price}\n\nCart Total: ₦${itemTotal.toFixed(2)}`;
         
-        alert(message);
+        showToast(message, 'success');
 
         // Force immediate update
         this.updateCartUI();
@@ -187,29 +187,33 @@ const CartManager = {
     removeFromCart(productId) {
         if (!AuthManager.isLoggedIn()) return;
 
-        if (!confirm('Remove this item from cart?')) return;
+        showConfirmationDialog(
+            'Remove this item from cart?',
+            () => {
+                const user = AuthManager.getCurrentUser();
+                const users = JSON.parse(localStorage.getItem('waymoreUsers') || '[]');
+                const userIndex = users.findIndex(u => u.id === user.id);
+                if (userIndex === -1) return;
 
-        const user = AuthManager.getCurrentUser();
-        const users = JSON.parse(localStorage.getItem('waymoreUsers') || '[]');
-        const userIndex = users.findIndex(u => u.id === user.id);
-        
-        if (userIndex === -1) return;
+                const removedItem = users[userIndex].cart.find(item => item.productId === productId);
+                users[userIndex].cart = users[userIndex].cart.filter(item => item.productId !== productId);
 
-        // Find the item being removed for notification
-        const removedItem = users[userIndex].cart.find(item => item.productId === productId);
-        
-        users[userIndex].cart = users[userIndex].cart.filter(item => item.productId !== productId);
+                localStorage.setItem('waymoreUsers', JSON.stringify(users));
+                localStorage.setItem('waymoreCurrentUser', JSON.stringify(users[userIndex]));
 
-        localStorage.setItem('waymoreUsers', JSON.stringify(users));
-        localStorage.setItem('waymoreCurrentUser', JSON.stringify(users[userIndex]));
+                if (removedItem) {
+                    const newTotal = this.calculateCartTotal(users[userIndex].cart);
+                    showToast(`${removedItem.name} removed from cart. Updated total: ₦${newTotal.toFixed(2)}`, 'success');
+                }
 
-        if (removedItem) {
-            const newTotal = this.calculateCartTotal(users[userIndex].cart);
-            alert(`${removedItem.name} removed from cart.\n\nUpdated total: ₦${newTotal.toFixed(2)}`);
-        }
+                this.updateCartUI();
+                this.displayCartItems();
+            },
+            () => showToast('Cart item removal cancelled', 'error'),
+            { title: 'Confirm removal', confirmText: 'Remove', cancelText: 'Cancel' }
+        );
 
-        this.updateCartUI();
-        this.displayCartItems();
+        return;
     },
 
     updateQuantity(productId, change) {
@@ -485,7 +489,7 @@ const CartManager = {
             console.log('Checkout button clicked');
             
             if (!AuthManager.isLoggedIn()) {
-                alert('⚠️ Please login to checkout!\n\nYou need to be logged in to complete your purchase.');
+                showToast('⚠️ Please login to checkout! You need to be logged in to complete your purchase.', 'error');
                 window.location.href = 'login.html';
                 return;
             }
@@ -494,7 +498,7 @@ const CartManager = {
             console.log('User cart:', user.cart);
             
             if (!user.cart || user.cart.length === 0) {
-                alert('⚠️ Your cart is empty!\n\nPlease add some products to your cart before checking out.');
+                showToast('⚠️ Your cart is empty! Please add some products to your cart before checking out.', 'error');
                 window.location.href = 'products.html';
                 return;
             }
@@ -513,11 +517,13 @@ const CartManager = {
                 `💰 Total Amount: ₦${total.toFixed(2)}\n\n` +
                 `Click OK to proceed to checkout page.`;
 
-            if (confirm(confirmMessage)) {
-                console.log('User confirmed, redirecting to checkout...');
-                
-                // Save cart summary to sessionStorage for checkout page
-                sessionStorage.setItem('checkoutData', JSON.stringify({
+            showConfirmationDialog(
+                confirmMessage,
+                () => {
+                    console.log('User confirmed, redirecting to checkout...');
+                    
+                    // Save cart summary to sessionStorage for checkout page
+                    sessionStorage.setItem('checkoutData', JSON.stringify({
                     cart: user.cart,
                     subtotal: subtotal,
                     shipping: shipping,
@@ -530,9 +536,13 @@ const CartManager = {
                 setTimeout(() => {
                     window.location.href = 'checkout.html';
                 }, 100);
-            } else {
+            },
+            () => {
                 console.log('User cancelled checkout');
-            }
+                showToast('Checkout cancelled', 'error');
+            },
+            { title: 'Proceed to Checkout', confirmText: 'Continue', cancelText: 'Cancel' }
+        );
         });
         
         // Also add a visual feedback on hover

@@ -86,6 +86,19 @@ function formatPriceDisplay(amount, currency = 'NGN') {
     return `${currencyInfo.symbol}${formatted}`;
 }
 
+function formatPriceInCurrency(amount, targetCurrency = 'NGN', sourceCurrency = 'NGN') {
+    const currencyInfo = CURRENCIES[targetCurrency];
+    if (!currencyInfo) return amount;
+
+    const numericValue = parseFloat(String(amount).replace(/[^\d.]/g, ''));
+    if (isNaN(numericValue)) {
+        return `${currencyInfo.symbol}0`;
+    }
+
+    const convertedAmount = convertPrice(numericValue, sourceCurrency, targetCurrency);
+    return formatPrice(convertedAmount, targetCurrency);
+}
+
 function updatePriceDisplay(element, rawPrice, sourceCurrency = 'NGN') {
     if (!element || !rawPrice) return;
     
@@ -765,6 +778,110 @@ function showToast(message, type = 'success') {
     }, 2600);
 }
 
+let confirmationCallback = null;
+let cancellationCallback = null;
+let confirmationResolved = false;
+let confirmationCancelMessage = '';
+
+function initConfirmationModal() {
+    if (document.getElementById('confirmation-modal')) return;
+
+    const modal = document.createElement('div');
+    modal.id = 'confirmation-modal';
+    modal.className = 'modal hidden';
+    modal.setAttribute('aria-hidden', 'true');
+    modal.innerHTML = `
+        <div class="modal__content confirmation-modal-content">
+            <div class="modal__header">
+                <div>
+                    <p class="eyebrow">CONFIRM ACTION</p>
+                    <h2 id="confirmation-title">Please confirm</h2>
+                </div>
+                <button class="icon-btn" id="confirmation-close" type="button" aria-label="Close confirmation"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="confirmation-body">
+                <p id="confirmation-message">Are you sure?</p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" type="button" id="confirmation-cancel">Cancel</button>
+                <button class="btn btn-primary" type="button" id="confirmation-confirm">Confirm</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    document.getElementById('confirmation-close')?.addEventListener('click', closeConfirmationModal);
+    document.getElementById('confirmation-cancel')?.addEventListener('click', closeConfirmationModal);
+    document.getElementById('confirmation-confirm')?.addEventListener('click', () => {
+        confirmationResolved = true;
+        if (confirmationCallback) confirmationCallback();
+        closeConfirmationModal();
+    });
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) closeConfirmationModal();
+    });
+}
+
+function showConfirmationModal(message, onConfirm, onCancel, cancelMessage = 'Action cancelled') {
+    initConfirmationModal();
+
+    const modal = document.getElementById('confirmation-modal');
+    const messageEl = document.getElementById('confirmation-message');
+    if (!modal || !messageEl) return;
+
+    messageEl.textContent = message;
+    confirmationCallback = typeof onConfirm === 'function' ? onConfirm : null;
+    cancellationCallback = typeof onCancel === 'function' ? onCancel : null;
+    confirmationCancelMessage = cancelMessage;
+    confirmationResolved = false;
+
+    modal.classList.remove('hidden');
+    modal.setAttribute('aria-hidden', 'false');
+}
+
+function closeConfirmationModal() {
+    const modal = document.getElementById('confirmation-modal');
+    if (!modal) return;
+
+    modal.classList.add('hidden');
+    modal.setAttribute('aria-hidden', 'true');
+    if (!confirmationResolved) {
+        if (cancellationCallback) {
+            cancellationCallback();
+        }
+        if (confirmationCancelMessage) {
+            showToast(confirmationCancelMessage, 'error');
+        }
+    }
+    confirmationCallback = null;
+    cancellationCallback = null;
+    confirmationResolved = false;
+    confirmationCancelMessage = '';
+}
+
+function getRegisteredUsers() {
+    try {
+        return JSON.parse(localStorage.getItem('waymoreUsers') || '[]');
+    } catch (error) {
+        return [];
+    }
+}
+
+function getAllCustomerOrders() {
+    return getRegisteredUsers().flatMap((user) => Array.isArray(user.orders) ? user.orders : []);
+}
+
+function getTotalRevenue() {
+    return getAllCustomerOrders().reduce((total, order) => {
+        const orderTotal = parseFloat(order.total);
+        return total + (isNaN(orderTotal) ? 0 : orderTotal);
+    }, 0);
+}
+
+function getPendingOrderCount() {
+    return getAllCustomerOrders().filter((order) => String(order.status || '').toLowerCase() === 'pending').length;
+}
+
 function handleLogin(event) {
     event.preventDefault();
     const form = event.currentTarget;
@@ -791,7 +908,12 @@ function populateStats() {
     const totalProducts = products.length;
     const publishedProducts = products.filter((product) => product.status === 'Published').length;
     const lowStock = products.filter((product) => Number(product.quantity) < 10).length;
-    const pendingOrders = 3;
+    const allOrders = getAllCustomerOrders();
+    const totalOrders = allOrders.length;
+    const totalCustomers = getRegisteredUsers().length;
+    const revenue = getTotalRevenue();
+    const pendingOrders = getPendingOrderCount();
+    const currentCurrency = getCurrentCurrency();
 
     const statProducts = document.getElementById('stat-products');
     const statOrders = document.getElementById('stat-orders');
@@ -801,9 +923,9 @@ function populateStats() {
     const statPendingOrders = document.getElementById('stat-pending-orders');
 
     if (statProducts) statProducts.textContent = totalProducts;
-    if (statOrders) statOrders.textContent = '24';
-    if (statRevenue) statRevenue.textContent = '₵8,400';
-    if (statCustomers) statCustomers.textContent = '142';
+    if (statOrders) statOrders.textContent = totalOrders;
+    if (statRevenue) statRevenue.textContent = formatPriceInCurrency(revenue, currentCurrency, 'NGN');
+    if (statCustomers) statCustomers.textContent = totalCustomers;
     if (statLowStock) statLowStock.textContent = lowStock;
     if (statPendingOrders) statPendingOrders.textContent = pendingOrders;
     document.querySelector('#product-table-body')?.setAttribute('data-count', String(totalProducts));
@@ -841,7 +963,7 @@ function renderProductsTable() {
             <td><img class="table-thumb" src="${resolveAssetPath(product.thumbnail || '/assets/img/products/waymoore_logo.jpg')}" alt="${product.name}"></td>
             <td>${product.name}</td>
             <td>${product.category}</td>
-            <td>${product.price}</td>
+            <td>${formatPriceInCurrency(product.basePriceInNaira || product.price, getCurrentCurrency(), 'NGN')}</td>
             <td>${product.quantity}</td>
             <td><span class="badge ${product.status.toLowerCase()}">${product.status}</span></td>
             <td>${product.updatedAt || product.createdAt}</td>
@@ -935,7 +1057,8 @@ async function handleProductSubmit(event) {
     const thumbnailFile = document.getElementById('product-thumbnail').files[0];
     const imageFiles = Array.from(document.getElementById('product-images').files || []);
 
-    const productPayload = {
+    const submitProduct = async () => {
+        const productPayload = {
         id: editingProductId || Date.now(),
         name: payload.name,
         category: payload.category,
@@ -979,6 +1102,14 @@ async function handleProductSubmit(event) {
         console.error(error);
         showToast('Unable to process uploaded files', 'error');
     }
+};
+
+    showConfirmationModal(
+        editingProductId ? 'Save changes to this product?' : 'Add this new product?',
+        submitProduct,
+        null,
+        editingProductId ? 'Product update cancelled' : 'Product creation cancelled'
+    );
 }
 
 function commitProduct(productPayload) {
@@ -1005,28 +1136,37 @@ function handleTableActions(event) {
         if (product) openModal(product);
     }
     if (action === 'duplicate') {
-        const product = products.find((entry) => entry.id === id);
-        if (product) {
-            const copy = { ...product, id: Date.now(), name: `${product.name} Copy`, slug: `${product.slug || 'product'}-copy` };
-            products.unshift(copy);
+        showConfirmationModal('Duplicate this product?', () => {
+            const product = products.find((entry) => entry.id === id);
+            if (product) {
+                const copy = { ...product, id: Date.now(), name: `${product.name} Copy`, slug: `${product.slug || 'product'}-copy` };
+                products.unshift(copy);
+                saveProducts();
+                renderProductsTable();
+                populateStats();
+                showToast('Product duplicated');
+            }
+        }, null, 'Product duplication cancelled');
+        return;
+    }
+    if (action === 'toggle') {
+        showConfirmationModal('Change this product visibility status?', () => {
+            products = products.map((product) => product.id === id ? { ...product, status: product.status === 'Hidden' ? 'Published' : 'Hidden' } : product);
             saveProducts();
             renderProductsTable();
             populateStats();
-            showToast('Product duplicated');
-        }
-    }
-    if (action === 'toggle') {
-        products = products.map((product) => product.id === id ? { ...product, status: product.status === 'Hidden' ? 'Published' : 'Hidden' } : product);
-        saveProducts();
-        renderProductsTable();
-        populateStats();
+        }, null, 'Product visibility update cancelled');
+        return;
     }
     if (action === 'delete') {
-        products = products.filter((product) => product.id !== id);
-        saveProducts();
-        renderProductsTable();
-        populateStats();
-        showToast('Product removed');
+        showConfirmationModal('Delete this product? This cannot be undone.', () => {
+            products = products.filter((product) => product.id !== id);
+            saveProducts();
+            renderProductsTable();
+            populateStats();
+            showToast('Product removed');
+        }, null, 'Product deletion cancelled');
+        return;
     }
 }
 
@@ -1042,25 +1182,31 @@ function bindDashboardEvents() {
     document.getElementById('product-filter')?.addEventListener('change', renderProductsTable);
     document.getElementById('product-sort')?.addEventListener('change', renderProductsTable);
     document.getElementById('bulk-publish-btn')?.addEventListener('click', () => {
-        products = products.map((product) => ({ ...product, status: 'Published' }));
-        saveProducts();
-        renderProductsTable();
-        populateStats();
-        showToast('Products published');
+        showConfirmationModal('Publish all products now?', () => {
+            products = products.map((product) => ({ ...product, status: 'Published' }));
+            saveProducts();
+            renderProductsTable();
+            populateStats();
+            showToast('Products published');
+        }, null, 'Publish all products cancelled');
     });
     document.getElementById('bulk-hide-btn')?.addEventListener('click', () => {
-        products = products.map((product) => ({ ...product, status: 'Hidden' }));
-        saveProducts();
-        renderProductsTable();
-        populateStats();
-        showToast('Products hidden');
+        showConfirmationModal('Hide all products now?', () => {
+            products = products.map((product) => ({ ...product, status: 'Hidden' }));
+            saveProducts();
+            renderProductsTable();
+            populateStats();
+            showToast('Products hidden');
+        }, null, 'Hide all products cancelled');
     });
     document.getElementById('bulk-delete-btn')?.addEventListener('click', () => {
-        products = [];
-        saveProducts();
-        renderProductsTable();
-        populateStats();
-        showToast('Products removed');
+        showConfirmationModal('Delete all products? This cannot be undone.', () => {
+            products = [];
+            saveProducts();
+            renderProductsTable();
+            populateStats();
+            showToast('Products removed');
+        }, null, 'Delete all products cancelled');
     });
     document.getElementById('logout-btn')?.addEventListener('click', logout);
     document.getElementById('sidebar-toggle')?.addEventListener('click', () => toggleSidebar());
@@ -1125,8 +1271,7 @@ function updatePreview() {
 
     document.getElementById('preview-name').textContent = name;
     document.getElementById('preview-description').textContent = shortDescription;
-    // Always display price in naira format (NGN) in preview
-    const formattedPrice = priceValue ? formatPrice(priceValue, 'NGN') : '₦0';
+    const formattedPrice = priceValue ? formatPriceInCurrency(priceValue, getCurrentCurrency(), 'NGN') : `${CURRENCIES[getCurrentCurrency()]?.symbol || '₦'}0`;
     document.getElementById('preview-price').textContent = formattedPrice;
 
     const previewList = document.getElementById('media-preview-list');
@@ -1171,104 +1316,92 @@ async function handleAddProductSubmit(event) {
     const form = event.currentTarget;
     const submitter = event.submitter;
     const mode = submitter?.dataset.mode || 'publish';
-    const name = form.querySelector('#product-name')?.value?.trim() || 'New Product';
-    const category = form.querySelector('#product-category')?.value || 'Uncategorized';
-    const subcategory = form.querySelector('#product-subcategory')?.value || '';
-    const currentCurrency = getCurrentCurrency();
-    
-    // Get raw price values from inputs
-    const priceInput = form.querySelector('#product-price')?.value || '0';
-    const discountPriceInput = form.querySelector('#product-discount')?.value || '';
-    
-    // Convert prices to Naira for consistent storage (reference currency)
-    const priceInNaira = convertPrice(priceInput, currentCurrency, 'NGN');
-    const discountPriceInNaira = discountPriceInput ? convertPrice(discountPriceInput, currentCurrency, 'NGN') : '';
-    
-    // Format prices with currency symbols for display
-    const price = formatPrice(priceInNaira, 'NGN');
-    const discountPrice = discountPriceInNaira ? formatPrice(discountPriceInNaira, 'NGN') : '';
-    
-    const sku = form.querySelector('#product-sku')?.value || `WP-${Date.now()}`;
-    const quantity = Number(form.querySelector('#product-quantity')?.value || 0);
-    const weight = form.querySelector('#product-weight')?.value || '';
-    const shortDescription = form.querySelector('#product-short-description')?.value || '';
-    const description = form.querySelector('#product-description')?.value || '';
-    const tags = form.querySelector('#product-tags')?.value || '';
-    const status = mode === 'draft' ? 'Draft' : (form.querySelector('#product-status')?.value || 'Published');
-    const featured = form.querySelector('#product-featured')?.checked || false;
-    const bestseller = form.querySelector('#product-bestseller')?.checked || false;
-    const newArrival = form.querySelector('#product-new-arrival')?.checked || false;
-    const trending = form.querySelector('#product-trending')?.checked || false;
-    const videoUrl = form.querySelector('#product-video')?.value || '';
-    const seoTitle = form.querySelector('#product-seo-title')?.value || name;
-    const seoDescription = form.querySelector('#product-seo-description')?.value || shortDescription;
-    const slug = form.querySelector('#product-slug')?.value || name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const confirmMessage = mode === 'draft'
+        ? 'Save this product as a draft?'
+        : 'Publish this product?';
 
-    // Handle image uploads
-    let thumbnail = 'assets/img/products/waymoore_logo.jpg';
-    let images = [];
-    let mediaIds = [];
-    const imageFiles = Array.from(form.querySelector('#product-images')?.files || []);
-    
-    try {
-        if (imageFiles.length > 0) {
-            // Convert all image files to data URLs and save to media library
-            const imageDataUrls = await Promise.all(imageFiles.map((file) => readFileAsDataURL(file)));
-            
-            // Add each image to media library and collect IDs
-            mediaIds = imageDataUrls.map((dataUrl, index) => {
-                return MediaLibrary.addMedia(imageFiles[index], dataUrl);
-            });
-            
-            // For backward compatibility, also keep data URLs
-            images = imageDataUrls;
-            thumbnail = imageDataUrls[0]; // Use first image as thumbnail
+    const proceedSubmit = async () => {
+        const name = form.querySelector('#product-name')?.value?.trim() || 'New Product';
+        const category = form.querySelector('#product-category')?.value || 'Uncategorized';
+        const subcategory = form.querySelector('#product-subcategory')?.value || '';
+        const currentCurrency = getCurrentCurrency();
+        const priceInput = form.querySelector('#product-price')?.value || '0';
+        const discountPriceInput = form.querySelector('#product-discount')?.value || '';
+        const priceInNaira = convertPrice(priceInput, currentCurrency, 'NGN');
+        const discountPriceInNaira = discountPriceInput ? convertPrice(discountPriceInput, currentCurrency, 'NGN') : '';
+        const price = formatPrice(priceInNaira, 'NGN');
+        const discountPrice = discountPriceInNaira ? formatPrice(discountPriceInNaira, 'NGN') : '';
+        const sku = form.querySelector('#product-sku')?.value || `WP-${Date.now()}`;
+        const quantity = Number(form.querySelector('#product-quantity')?.value || 0);
+        const weight = form.querySelector('#product-weight')?.value || '';
+        const shortDescription = form.querySelector('#product-short-description')?.value || '';
+        const description = form.querySelector('#product-description')?.value || '';
+        const tags = form.querySelector('#product-tags')?.value || '';
+        const status = mode === 'draft' ? 'Draft' : (form.querySelector('#product-status')?.value || 'Published');
+        const featured = form.querySelector('#product-featured')?.checked || false;
+        const bestseller = form.querySelector('#product-bestseller')?.checked || false;
+        const newArrival = form.querySelector('#product-new-arrival')?.checked || false;
+        const trending = form.querySelector('#product-trending')?.checked || false;
+        const videoUrl = form.querySelector('#product-video')?.value || '';
+        const seoTitle = form.querySelector('#product-seo-title')?.value || name;
+        const seoDescription = form.querySelector('#product-seo-description')?.value || shortDescription;
+        const slug = form.querySelector('#product-slug')?.value || name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        let thumbnail = 'assets/img/products/waymoore_logo.jpg';
+        let images = [];
+        let mediaIds = [];
+        const imageFiles = Array.from(form.querySelector('#product-images')?.files || []);
+        try {
+            if (imageFiles.length > 0) {
+                const imageDataUrls = await Promise.all(imageFiles.map((file) => readFileAsDataURL(file)));
+                mediaIds = imageDataUrls.map((dataUrl, index) => MediaLibrary.addMedia(imageFiles[index], dataUrl));
+                images = imageDataUrls;
+                thumbnail = imageDataUrls[0];
+            }
+        } catch (error) {
+            console.error('Error processing images:', error);
+            showToast('Error processing images. Proceeding without images.', 'error');
         }
-    } catch (error) {
-        console.error('Error processing images:', error);
-        showToast('Error processing images. Proceeding without images.', 'error');
-    }
-
-    const productPayload = {
-        id: Date.now(),
-        name,
-        category,
-        subcategory,
-        price,
-        discountPrice,
-        sku,
-        quantity,
-        weight,
-        shortDescription,
-        description,
-        ingredients: '',
-        benefits: '',
-        directions: '',
-        warnings: '',
-        tags,
-        status,
-        featured,
-        bestseller,
-        newArrival,
-        trending,
-        thumbnail,
-        images,
-        mediaIds,
-        videoUrl,
-        seoTitle,
-        seoDescription,
-        slug,
-        createdAt: new Date().toISOString().slice(0, 10),
-        updatedAt: new Date().toISOString().slice(0, 10),
-        // Store currency metadata for price conversion
-        baseCurrency: 'NGN',
-        basePriceInNaira: priceInNaira
+        const productPayload = {
+            id: Date.now(),
+            name,
+            category,
+            subcategory,
+            price,
+            discountPrice,
+            sku,
+            quantity,
+            weight,
+            shortDescription,
+            description,
+            ingredients: '',
+            benefits: '',
+            directions: '',
+            warnings: '',
+            tags,
+            status,
+            featured,
+            bestseller,
+            newArrival,
+            trending,
+            thumbnail,
+            images,
+            mediaIds,
+            videoUrl,
+            seoTitle,
+            seoDescription,
+            slug,
+            createdAt: new Date().toISOString().slice(0, 10),
+            updatedAt: new Date().toISOString().slice(0, 10),
+            baseCurrency: 'NGN',
+            basePriceInNaira: priceInNaira
+        };
+        products.unshift(productPayload);
+        saveProducts();
+        showToast(mode === 'draft' ? 'Product saved as draft' : 'Product published successfully');
+        window.location.href = 'products/products.html';
     };
 
-    products.unshift(productPayload);
-    saveProducts();
-    showToast(mode === 'draft' ? 'Product saved as draft' : 'Product published successfully');
-    window.location.href = 'products/products.html';
+    showConfirmationModal(confirmMessage, proceedSubmit, null, 'Product action cancelled');
 }
 
 function initializeDashboard() {
@@ -1291,6 +1424,10 @@ function initializeSharedAdminShell() {
     const sidebarToggle = document.getElementById('sidebar-toggle');
     sidebarToggle?.addEventListener('click', () => toggleSidebar());
     document.getElementById('sidebar-overlay')?.addEventListener('click', () => toggleSidebar(false));
+    document.getElementById('logout-btn')?.addEventListener('click', (event) => {
+        event.preventDefault();
+        logout();
+    });
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') {
             toggleSidebar(false);
@@ -1306,6 +1443,59 @@ function initializeSharedAdminShell() {
     });
 }
 
+function populateAddProductFormFromQuery() {
+    try {
+        const params = new URLSearchParams(window.location.search);
+        const idParam = params.get('id') || params.get('productId') || params.get('edit');
+        if (!idParam) return;
+        const id = Number(idParam);
+        const product = products.find((p) => p.id === id);
+        if (!product) return;
+
+        // Set editing state to allow update on submit
+        window.editingProductId = product.id;
+
+        // Fill fields on add-product form
+        const setVal = (sel, val) => { const el = document.getElementById(sel); if (el) el.value = val; };
+        setVal('product-name', product.name || '');
+        setVal('product-short-description', product.shortDescription || '');
+        setVal('product-description', product.description || '');
+        setVal('product-category', product.category || '');
+        setVal('product-subcategory', product.subcategory || '');
+        setVal('product-price', String(product.basePriceInNaira || product.price || '').replace(/[^\d.]/g, ''));
+        setVal('product-discount', String(product.discountPrice || '').replace(/[^\d.]/g, ''));
+        setVal('product-sku', product.sku || '');
+        setVal('product-quantity', product.quantity || 0);
+        setVal('product-weight', product.weight || '');
+        setVal('product-tags', product.tags || '');
+        setVal('product-video', product.videoUrl || '');
+        setVal('product-seo-title', product.seoTitle || '');
+        setVal('product-seo-description', product.seoDescription || '');
+        setVal('product-slug', product.slug || '');
+        const statusEl = document.getElementById('product-status'); if (statusEl) statusEl.value = product.status || 'Published';
+        const setCheck = (sel, v) => { const el = document.getElementById(sel); if (el) el.checked = Boolean(v); };
+        setCheck('product-featured', product.featured);
+        setCheck('product-bestseller', product.bestseller);
+        setCheck('product-new-arrival', product.newArrival);
+        setCheck('product-trending', product.trending);
+
+        // Preview updates
+        const previewName = document.getElementById('preview-name'); if (previewName) previewName.textContent = product.name || 'Product Name';
+        const previewDesc = document.getElementById('preview-description'); if (previewDesc) previewDesc.textContent = product.shortDescription || 'Short description will appear here.';
+        const previewPrice = document.getElementById('preview-price'); if (previewPrice) previewPrice.textContent = formatPriceInCurrency(product.basePriceInNaira || product.price || 0, getCurrentCurrency(), 'NGN');
+        const previewImage = document.querySelector('.preview-card img') || document.getElementById('preview-image');
+        if (previewImage) previewImage.src = resolveAssetPath(product.thumbnail || (Array.isArray(product.images) && product.images[0]) || 'assets/img/products/waymoore_logo.jpg');
+
+        const previewList = document.getElementById('media-preview-list');
+        if (previewList) {
+            const imgs = (product.images && product.images.length) ? product.images : (product.thumbnail ? [product.thumbnail] : []);
+            previewList.innerHTML = imgs.map((img, i) => `<div class="media-preview-item ${i===0? 'active':''}"><img src="${resolveAssetPath(img)}" alt="Preview"></div>`).join('');
+        }
+    } catch (err) {
+        console.error('populateAddProductFormFromQuery error', err);
+    }
+}
+
 function initializeCurrencySelector() {
     const currencySelect = document.getElementById('currency-select');
     if (!currencySelect) return;
@@ -1313,6 +1503,7 @@ function initializeCurrencySelector() {
     // Set initial value to current currency
     const currentCurrency = getCurrentCurrency();
     currencySelect.value = currentCurrency;
+    updateAllPriceDisplays(currentCurrency);
     
     // Update price displays when currency changes
     currencySelect.addEventListener('change', (event) => {
@@ -1336,9 +1527,9 @@ function formatPriceInput(value) {
     const num = parseFloat(numeric);
     if (isNaN(num)) return '';
     
-    // Format with naira symbol
+    const currency = getCurrentCurrency();
     const formatted = num.toLocaleString('en-US', { maximumFractionDigits: 0 });
-    return `${CURRENCIES.NGN.symbol}${formatted}`;
+    return `${CURRENCIES[currency]?.symbol || CURRENCIES.NGN.symbol}${formatted}`;
 }
 
 function addPriceInputFormatting() {
@@ -1363,17 +1554,33 @@ function updateAllPriceDisplays(currency) {
     const priceInput = document.getElementById('product-price');
     const discountInput = document.getElementById('product-discount');
     const previewPrice = document.getElementById('preview-price');
-    
+    const statRevenue = document.getElementById('stat-revenue');
+
     if (priceInput && priceInput.value) {
         const convertedPrice = convertPrice(priceInput.value, 'NGN', currency);
         const formatted = formatPrice(convertedPrice, currency);
         priceInput.value = convertedPrice;
-        if (previewPrice) previewPrice.textContent = formatted;
+        if (previewPrice) {
+            previewPrice.dataset.priceNgn = priceInput.value;
+            previewPrice.textContent = formatted;
+        }
     }
-    
+
     if (discountInput && discountInput.value) {
         const convertedDiscount = convertPrice(discountInput.value, 'NGN', currency);
         discountInput.value = convertedDiscount;
+    }
+
+    if (previewPrice && previewPrice.dataset.priceNgn) {
+        previewPrice.textContent = formatPrice(convertPrice(previewPrice.dataset.priceNgn, 'NGN', currency), currency);
+    }
+
+    if (statRevenue) {
+        statRevenue.textContent = formatPriceInCurrency(getTotalRevenue(), currency, 'NGN');
+    }
+
+    if (typeof renderProductsTable === 'function') {
+        renderProductsTable();
     }
 }
 
@@ -1390,5 +1597,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const addProductForm = document.getElementById('add-product-form');
     if (addProductForm) {
         addProductForm.addEventListener('submit', handleAddProductSubmit);
+        // Prefill when editing via query param: add-product.html?id=123
+        populateAddProductFormFromQuery();
     }
 });

@@ -951,6 +951,55 @@ nav a:hover {
     transform: rotate(90deg);
 }
 
+.global-dialog-content {
+    max-width: 480px;
+    padding: 24px;
+    border-radius: 14px;
+}
+
+.dialog-body {
+    margin-top: 16px;
+    color: #374151;
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 22px;
+}
+
+.toast-container {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 60000;
+}
+
+.toast {
+    min-width: 240px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    color: #fff;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.2);
+    background: linear-gradient(135deg, #10b981, #047857);
+    white-space: pre-wrap;
+}
+
+.toast.success {
+    background: linear-gradient(135deg, #10b981, #047857);
+}
+
+.toast.error {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+}
+
 .modal-content h2 {
     margin-bottom: 0.5rem;
     clear: both;

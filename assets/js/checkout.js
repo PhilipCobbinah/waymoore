@@ -9,14 +9,14 @@ const CheckoutManager = {
 
     checkAuth() {
         if (!AuthManager.isLoggedIn()) {
-            alert('Please login to continue with checkout!');
+            showToast('Please login to continue with checkout!', 'error');
             window.location.href = 'login.html';
             return;
         }
 
         const user = AuthManager.getCurrentUser();
         if (!user.cart || user.cart.length === 0) {
-            alert('Your cart is empty! Please add items to your cart first.');
+            showToast('Your cart is empty! Please add items to your cart first.', 'error');
             window.location.href = 'products.html';
             return;
         }
@@ -134,13 +134,13 @@ const CheckoutManager = {
 
         // Validate
         if (!orderData.fullName || !orderData.phone || !orderData.address || !orderData.city) {
-            alert('Please fill in all required fields marked with *');
+            showToast('Please fill in all required fields marked with *', 'error');
             return;
         }
 
         // Phone validation
         if (orderData.phone.length < 10) {
-            alert('Please enter a valid phone number');
+            showToast('Please enter a valid phone number', 'error');
             return;
         }
 
@@ -190,9 +190,12 @@ const CheckoutManager = {
             (orderData.notes ? `📝 Notes: ${orderData.notes}\n\n` : '') +
             `Place this order?`;
 
-        if (!confirm(confirmMessage)) return;
-
-        this.createOrder(orderData, total);
+        showConfirmationDialog(
+            confirmMessage,
+            () => this.createOrder(orderData, total),
+            () => showToast('Order confirmation cancelled', 'error'),
+            { title: 'Confirm Order', confirmText: 'Place Order', cancelText: 'Cancel' }
+        );
     },
 
     createOrder(orderData, total) {
@@ -273,13 +276,11 @@ const CheckoutManager = {
             `WAYMOORE! 🌿\n` +
             `━━━━━━━━━━━━━━━━━━━━━━`;
 
-        alert(successMessage);
-        
-        // Clear checkout data from session
-        sessionStorage.removeItem('checkoutData');
-        
-        CartManager.updateCartUI();
-        window.location.href = 'products.html';
+        showMessageDialog('Order placed successfully', successMessage, () => {
+            sessionStorage.removeItem('checkoutData');
+            CartManager.updateCartUI();
+            window.location.href = 'products.html';
+        }, 'Close');
     }
 };
 
