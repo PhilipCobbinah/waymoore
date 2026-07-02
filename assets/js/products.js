@@ -190,7 +190,7 @@ function normalizeStorefrontProduct(product) {
         id: Number(product.id || Date.now()),
         name: product.name || 'Untitled Product',
         category: product.category || 'Uncategorized',
-        price: product.price || product.discountPrice || '₵0',
+        price: product.price || product.discountPrice || '₦0',
         image: resolveStorefrontAssetPath(normalizedImage),
         description: product.description || product.shortDescription || '',
         detailUrl: product.detailUrl || '',

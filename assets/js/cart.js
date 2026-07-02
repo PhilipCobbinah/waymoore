@@ -87,8 +87,8 @@ const CartManager = {
 
         const itemTotal = this.calculateCartTotal(users[userIndex].cart);
         const message = cartItem 
-            ? `✅ ${product.name}\n\nAdded ${quantityToAdd} more. Quantity is now ${cartItem.quantity}\n\nCart Total: ₵${itemTotal.toFixed(2)}`
-            : `✅ ${product.name}\n\nAdded to cart!\n\nQuantity: ${quantityToAdd}\nPrice: ${product.price}\n\nCart Total: ₵${itemTotal.toFixed(2)}`;
+            ? `✅ ${product.name}\n\nAdded ${quantityToAdd} more. Quantity is now ${cartItem.quantity}\n\nCart Total: ₦${itemTotal.toFixed(2)}`
+            : `✅ ${product.name}\n\nAdded to cart!\n\nQuantity: ${quantityToAdd}\nPrice: ${product.price}\n\nCart Total: ₦${itemTotal.toFixed(2)}`;
         
         alert(message);
 
@@ -148,7 +148,7 @@ const CartManager = {
                 <strong>${totalItems}</strong> items in cart
             </p>
             <p style="margin: 0.5rem 0; font-size: 1.1rem; font-weight: bold;">
-                Total: ₵${total.toFixed(2)}
+                Total: ₦${total.toFixed(2)}</p>
             </p>
             <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
                 <a href="cart.html" style="
@@ -205,7 +205,7 @@ const CartManager = {
 
         if (removedItem) {
             const newTotal = this.calculateCartTotal(users[userIndex].cart);
-            alert(`${removedItem.name} removed from cart.\n\nUpdated total: ₵${newTotal.toFixed(2)}`);
+            alert(`${removedItem.name} removed from cart.\n\nUpdated total: ₦${newTotal.toFixed(2)}`);
         }
 
         this.updateCartUI();
@@ -333,7 +333,7 @@ const CartManager = {
                     <p class="cart-stats">
                         <span class="stat-badge">${totalItems} ${totalItems === 1 ? 'Product' : 'Products'}</span>
                         <span class="stat-badge">${totalQuantity} ${totalQuantity === 1 ? 'Item' : 'Items'}</span>
-                        <span class="stat-badge total">Total: ₵${subtotal.toFixed(2)}</span>
+                        <span class="stat-badge total">Total: ₦${subtotal.toFixed(2)}</span>
                     </p>
                 </div>
             </div>
@@ -370,8 +370,8 @@ const CartManager = {
                             </div>
                             <div class="cart-item-total">
                                 <p class="item-total-label">Item Total</p>
-                                <p class="item-total-price">₵${itemTotal.toFixed(2)}</p>
-                                <p class="item-calculation">${item.quantity} × ₵${safeItemPrice.toFixed(2)}</p>
+                                <p class="item-total-price">₦${itemTotal.toFixed(2)}</p>
+                                <p class="item-calculation">${item.quantity} × ₦${safeItemPrice.toFixed(2)}</p>
                             </div>
                             <button class="remove-btn" onclick="CartManager.removeFromCart(${item.productId})" title="Remove from cart">
                                 <i class="fas fa-trash"></i>
@@ -398,9 +398,9 @@ const CartManager = {
         const shippingEl = document.getElementById('cart-shipping');
         const totalEl = document.getElementById('cart-total');
 
-        if (subtotalEl) subtotalEl.textContent = `₵${subtotal.toFixed(2)}`;
-        if (shippingEl) shippingEl.textContent = shipping > 0 ? `₵${shipping.toFixed(2)}` : 'FREE';
-        if (totalEl) totalEl.textContent = `₵${total.toFixed(2)}`;
+        if (subtotalEl) subtotalEl.textContent = `₦${subtotal.toFixed(2)}`;
+        if (shippingEl) shippingEl.textContent = shipping > 0 ? `₦${shipping.toFixed(2)}` : 'FREE';
+        if (totalEl) totalEl.textContent = `₦${total.toFixed(2)}`;
 
         // Update item count in summary
         const summaryItemCount = document.getElementById('summary-item-count');
@@ -447,7 +447,7 @@ const CartManager = {
                                     <i class="fas fa-plus"></i>
                                 </button>
                             </div>
-                            <span class="item-price">₵${itemTotal.toFixed(2)}</span>
+                            <span class="item-price">₦${itemTotal.toFixed(2)}</span>
                         </div>
                     </div>
                 `;
@@ -465,7 +465,7 @@ const CartManager = {
             headerStats.innerHTML = `
                 <span class="stat-badge">${uniqueProducts} ${uniqueProducts === 1 ? 'Product' : 'Products'}</span>
                 <span class="stat-badge">${itemCount} ${itemCount === 1 ? 'Item' : 'Items'}</span>
-                <span class="stat-badge total">Total: ₵${subtotal.toFixed(2)}</span>
+                <span class="stat-badge total">Total: ₦${subtotal.toFixed(2)}</span>
             `;
         }
     },
@@ -510,7 +510,7 @@ const CartManager = {
                 `🛍️ Ready to checkout?\n\n` +
                 `📦 Products: ${user.cart.length}\n` +
                 `🔢 Total Items: ${itemCount}\n` +
-                `💰 Total Amount: ₵${total.toFixed(2)}\n\n` +
+                `💰 Total Amount: ₦${total.toFixed(2)}\n\n` +
                 `Click OK to proceed to checkout page.`;
 
             if (confirm(confirmMessage)) {

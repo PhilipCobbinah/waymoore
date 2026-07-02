@@ -36,7 +36,7 @@ const CheckoutManager = {
         let summaryHTML = '<div class="checkout-items-list">';
         
         user.cart.forEach((item, index) => {
-            const itemPrice = parseFloat(item.price.replace('₵', ''));
+            const itemPrice = parseFloat(item.price.replace('₦', ''));
             const itemTotal = itemPrice * item.quantity;
             
             summaryHTML += `
@@ -52,7 +52,7 @@ const CheckoutManager = {
                             <span>${item.price} × ${item.quantity}</span>
                         </p>
                     </div>
-                    <div class="checkout-item-price">₵${itemTotal.toFixed(2)}</div>
+                    <div class="checkout-item-price">₦${itemTotal.toFixed(2)}</div>
                 </div>
             `;
         });
@@ -69,9 +69,9 @@ const CheckoutManager = {
         const total = subtotal + shipping;
         const itemCount = CartManager.getItemCount();
 
-        document.getElementById('checkout-subtotal').textContent = `₵${subtotal.toFixed(2)}`;
-        document.getElementById('checkout-shipping').textContent = `₵${shipping.toFixed(2)}`;
-        document.getElementById('checkout-total').textContent = `₵${total.toFixed(2)}`;
+        document.getElementById('checkout-subtotal').textContent = `₦${subtotal.toFixed(2)}`;
+        document.getElementById('checkout-shipping').textContent = `₦${shipping.toFixed(2)}`;
+        document.getElementById('checkout-total').textContent = `₦${total.toFixed(2)}`;
         
         // Update item count display
         const itemCountEl = document.querySelector('.checkout-item-count');
@@ -181,10 +181,10 @@ const CheckoutManager = {
             `🛍️ Order Summary:\n` +
             `Products: ${user.cart.length}\n` +
             `Total Items: ${itemCount}\n` +
-            `Subtotal: ₵${subtotal.toFixed(2)}\n` +
-            `Shipping: ₵${shipping.toFixed(2)}\n` +
+            `Subtotal: ₦${subtotal.toFixed(2)}\n` +
+            `Shipping: ₦${shipping.toFixed(2)}\n` +
             `━━━━━━━━━━━━━━━━━━━━━━\n` +
-            `TOTAL: ₵${total.toFixed(2)}\n` +
+            `TOTAL: ₦${total.toFixed(2)}\n` +
             `━━━━━━━━━━━━━━━━━━━━━━\n\n` +
             `${paymentIcon} Payment: ${paymentMethodName}\n\n` +
             (orderData.notes ? `📝 Notes: ${orderData.notes}\n\n` : '') +
@@ -229,7 +229,7 @@ const CheckoutManager = {
                 `\n━━━━━━━━━━━━━━━━━━━━━━\n` +
                 `📱 MOMO PAYMENT INSTRUCTIONS\n` +
                 `━━━━━━━━━━━━━━━━━━━━━━\n` +
-                `1. Send ₵${total.toFixed(2)} to:\n` +
+                `1. Send ₦${total.toFixed(2)} to:\n` +
                 `   📞 0592805834\n\n` +
                 `2. Reference Number:\n` +
                 `   ORDER-${order.id}\n\n` +
@@ -248,7 +248,7 @@ const CheckoutManager = {
                 `💵 CASH ON DELIVERY\n` +
                 `━━━━━━━━━━━━━━━━━━━━━━\n` +
                 `Prepare exact amount:\n` +
-                `₵${total.toFixed(2)}\n` +
+                `₦${total.toFixed(2)}\n` +
                 `Payment upon delivery.\n`;
         }
 
@@ -264,7 +264,7 @@ const CheckoutManager = {
             `${orderData.address}\n` +
             `${orderData.city}\n` +
             `📞 ${orderData.phone}\n\n` +
-            `💰 Total Amount: ₵${total.toFixed(2)}\n` +
+            `💰 Total Amount: ₦${total.toFixed(2)}\n` +
             paymentInstructions +
             `\n━━━━━━━━━━━━━━━━━━━━━━\n` +
             `We'll contact you via:\n` +

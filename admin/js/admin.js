@@ -70,6 +70,21 @@ function formatPrice(amount, currency = 'NGN') {
     return `${currencyInfo.symbol}${formatted}`;
 }
 
+function formatPriceDisplay(amount, currency = 'NGN') {
+    const currencyInfo = CURRENCIES[currency];
+    if (!currencyInfo) return amount;
+    
+    const numericValue = parseFloat(String(amount).replace(/[^\d.]/g, ''));
+    if (isNaN(numericValue)) return amount;
+    
+    const isLargeNumber = numericValue >= 1000;
+    const formatted = isLargeNumber 
+        ? numericValue.toLocaleString('en-US', { maximumFractionDigits: 0 })
+        : numericValue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    
+    return `${currencyInfo.symbol}${formatted}`;
+}
+
 function updatePriceDisplay(element, rawPrice, sourceCurrency = 'NGN') {
     if (!element || !rawPrice) return;
     
@@ -1050,7 +1065,7 @@ function bindDashboardEvents() {
 
 function updatePreview() {
     const name = document.getElementById('product-name')?.value || 'Product Name';
-    const price = document.getElementById('product-price')?.value || '₵0';
+    const priceValue = document.getElementById('product-price')?.value || '0';
     const shortDescription = document.getElementById('product-short-description')?.value || 'Short description will appear here.';
     const previewImage = document.getElementById('preview-image');
     const thumbnailInput = document.getElementById('product-thumbnail');
@@ -1058,7 +1073,9 @@ function updatePreview() {
 
     document.getElementById('preview-name').textContent = name;
     document.getElementById('preview-description').textContent = shortDescription;
-    document.getElementById('preview-price').textContent = price;
+    // Always display price in naira format (NGN) in preview
+    const formattedPrice = priceValue ? formatPrice(priceValue, 'NGN') : '₦0';
+    document.getElementById('preview-price').textContent = formattedPrice;
 
     const previewList = document.getElementById('media-preview-list');
     if (previewList) {
@@ -1250,6 +1267,37 @@ function initializeCurrencySelector() {
     });
 }
 
+function formatPriceInput(value) {
+    // Remove any non-numeric characters except decimal point
+    const numeric = String(value).replace(/[^\d.]/g, '');
+    if (!numeric) return '';
+    
+    const num = parseFloat(numeric);
+    if (isNaN(num)) return '';
+    
+    // Format with naira symbol
+    const formatted = num.toLocaleString('en-US', { maximumFractionDigits: 0 });
+    return `${CURRENCIES.NGN.symbol}${formatted}`;
+}
+
+function addPriceInputFormatting() {
+    const priceFields = ['product-price', 'product-discount'];
+    
+    priceFields.forEach((fieldId) => {
+        const field = document.getElementById(fieldId);
+        if (!field) return;
+        
+        field.addEventListener('blur', (event) => {
+            const value = event.target.value;
+            if (value) {
+                const numeric = parseFloat(String(value).replace(/[^\d.]/g, ''));
+                event.target.value = numeric || '';
+                updatePreview();
+            }
+        });
+    });
+}
+
 function updateAllPriceDisplays(currency) {
     const priceInput = document.getElementById('product-price');
     const discountInput = document.getElementById('product-discount');
@@ -1271,6 +1319,7 @@ function updateAllPriceDisplays(currency) {
 document.addEventListener('DOMContentLoaded', () => {
     initializeSharedAdminShell();
     initializeCurrencySelector();
+    addPriceInputFormatting();
     if (document.getElementById('admin-login-form')) {
         initializeLogin();
     }

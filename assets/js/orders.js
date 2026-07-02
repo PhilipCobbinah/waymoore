@@ -42,14 +42,14 @@ function displayOrders() {
                         
                         <div class="order-items">
                             ${order.items.map((item, i) => {
-                                const itemPrice = parseFloat(item.price.replace('₵', ''));
+                                const itemPrice = parseFloat(item.price.replace('₦', ''));
                                 const itemTotal = itemPrice * item.quantity;
                                 return `
                                     <div class="order-item">
                                         <span class="item-num">${i + 1}.</span>
                                         <span class="item-name">${item.name}</span>
                                         <span class="item-qty">×${item.quantity}</span>
-                                        <span class="item-price">₵${itemTotal.toFixed(2)}</span>
+                                        <span class="item-price">₦${itemTotal.toFixed(2)}</span>
                                     </div>
                                 `;
                             }).join('')}
@@ -63,9 +63,9 @@ function displayOrders() {
                                 <p><i class="fas fa-credit-card"></i> ${getPaymentMethodName(order.paymentMethod)}</p>
                             </div>
                             <div class="order-total">
-                                <p>Subtotal: ₵${order.subtotal.toFixed(2)}</p>
-                                <p>Shipping: ₵${order.shipping.toFixed(2)}</p>
-                                <p class="total"><strong>Total: ₵${order.total.toFixed(2)}</strong></p>
+                                <p>Subtotal: ₦${order.subtotal.toFixed(2)}</p>
+                                <p>Shipping: ₦${order.shipping.toFixed(2)}</p>
+                                <p class="total"><strong>Total: ₦${order.total.toFixed(2)}</strong></p>
                             </div>
                         </div>
                     </div>
