@@ -203,6 +203,15 @@ function resolveMediaUrl(image) {
     return image;
 }
 
+function formatStorefrontPrice(value) {
+    const numericValue = parseFloat(String(value ?? '').replace(/[^\d.]/g, ''));
+    if (Number.isNaN(numericValue)) {
+        return '₦0';
+    }
+
+    return `₦${numericValue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+}
+
 function normalizeStorefrontProduct(product) {
     let image = product.image || product.thumbnail || (Array.isArray(product.images) ? product.images[0] : '') || 'assets/img/products/waymoore_logo.jpg';
     
@@ -215,7 +224,7 @@ function normalizeStorefrontProduct(product) {
         id: Number(product.id || Date.now()),
         name: product.name || 'Untitled Product',
         category: product.category || 'Uncategorized',
-        price: product.price || product.discountPrice || '₦0',
+        price: formatStorefrontPrice(product.price || product.discountPrice || '0'),
         image: resolveStorefrontAssetPath(normalizedImage),
         description: product.description || product.shortDescription || '',
         detailUrl: product.detailUrl || '',

@@ -99,6 +99,8 @@ input:focus, select:focus, textarea:focus { outline: 2px solid rgba(16,185,129,0
     flex-shrink: 0;
 }
 .sidebar.collapsed { width: 90px; }
+.sidebar__close { display: none; position: absolute; top: 16px; right: 16px; width: 40px; height: 40px; border: none; border-radius: 50%; background: rgba(255,255,255,0.14); color: white; cursor: pointer; z-index: 5; }
+.sidebar__close:hover { background: rgba(255,255,255,0.22); }
 .sidebar__brand { display: flex; gap: 12px; align-items: center; transition: all .3s ease; }
 .sidebar__brand img { width: 48px; border-radius: 16px; }
 .sidebar.collapsed .sidebar__brand { justify-content: center; }
@@ -213,6 +215,7 @@ th { color: var(--muted); font-size: .9rem; }
 @media (max-width: 768px) {
     .sidebar-toggle { display: inline-flex; align-items: center; justify-content: center; }
     .sidebar { position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; width: min(320px, 85%); transform: translateX(-100%); box-shadow: 8px 0 30px rgba(15,61,43,0.16); }
+    .sidebar__close { display: inline-flex; align-items: center; justify-content: center; }
     .sidebar.open { transform: translateX(0); }
     .sidebar.collapsed { width: min(320px, 85%); }
     .sidebar.collapsed .sidebar__nav span { display: inline; }
